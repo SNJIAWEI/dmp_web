@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block privateJsAndCss %}
-    <script src="{% static "selectpicker/css/bootstrap-select.css" %}"></script>
+    <link rel="stylesheet" href="{% static "selectpicker/css/bootstrap-select.css" %}">
     <script src="{% static "selectpicker/js/bootstrap-select.min.js" %}"></script>
     <script src="{% static "selectpicker/js/i18n/defaults-zh_CN.min.js" %}"></script>
 {% endblock %}
@@ -16,54 +16,71 @@
     <div class="modal-body">
         <form class="form-horizontal" method="post" action="/dmp/appsinfo/update/">{% csrf_token %}
             <div class="form-group">
-                <label class="col-sm-2 control-label">APP标识</label>
-                <div class="col-sm-10">
+                <label class="col-lg-2 control-label">APP标识</label>
+                <div class="col-lg-10">
                     <p class="form-control-static">{{ app.appName }}</p>
                 </div>
             </div>
             <div class="form-group">
-                <label for="inputEmail3" class="col-sm-2 control-label">APP描述</label>
-                <div class="col-sm-10">
+                <label for="inputEmail3" class="col-lg-2 control-label">APP描述</label>
+                <div class="col-lg-10">
                 <textarea id="appDesc_{{ app.id }}" class="form-control" rows="5" name="appDesc"
                           placeholder="APP描述">{{ app.appDesc }}</textarea>
                 </div>
             </div>
             <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">类别</label>
-                <div class="col-sm-10">
+                <label for="maxOption2" class="col-lg-2 control-label">兴趣分类</label>
+                <div class="col-lg-10">
+                    <select id="basic" name="appBssIntr" class="selectpicker show-tick form-control" data-live-search="true">
+                        {% for type in interest_type_list %}
+                            {% if type.dictId|length == 5 and forloop.first%}
+                            <optgroup label="{{ type.dictName }}" >
+                            {% elif type.dictId|length == 9 %}
+                                <option value="{{ type.dictId }}" {% ifequal app.appBssIntr type.dictId %} selected{% endifequal %}>{{ type.dictName }}</option>
+                                {% if forloop.last %}
+                                    </optgroup>
+                                {% endif %}
+                            {% elif type.dictId|length == 5 %}
+                            </optgroup><optgroup label="{{ type.dictName }}" >
+                                {% if forloop.last %}
+                                    </optgroup>
+                                {% endif %}
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-lg-2 control-label">类别</label>
+                <div class="col-lg-10">
                     <select id="appType_{{ app.id }}" class="form-control" name="appType">
-                    {% dicts_tag 'APP类别' app.appType %}
+                        {% dicts_tag 'APP类别' app.appType %}
                     </select>
                 </div>
             </div>
             <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">商业兴趣</label>
-                <div class="col-sm-10">
-                    <select id="appBssIntrs_{{ app.id }}" class="form-control" name="appBssIntr">
-                        {% dicts_tag '商业兴趣' app.appBssIntr %}
-                    </select>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">性别</label>
-                <div class="col-sm-10">
+                <label for="inputPassword3" class="col-lg-2 control-label">性别</label>
+                <div class="col-lg-10">
                     <select id="appSex_{{ app.id }}" class="form-control" name="appSex">
                         {% dicts_tag '性别' app.appSex %}
                     </select>
                 </div>
             </div>
             <div class="form-group">
-                <label for="inputPassword3" class="col-sm-2 control-label">人生阶段</label>
-                <div class="col-sm-10">
+                <label for="inputPassword3" class="col-lg-2 control-label">人生阶段</label>
+                <div class="col-lg-10">
                     <select id="appStage_{{ app.id }}" class="form-control" name="appStage">
                         {% dicts_tag '人生阶段' app.appStage %}
                     </select>
                 </div>
-            </div><br>
+            </div>
+            <br>
 
             <div class="modal-footer ">
-                <input type="hidden" name="appId" value="{{ app.id }}" />
-                <input type="hidden" name="page" value="{{ page }}" />
+                <input type="hidden" name="appId" value="{{ app.id }}"/>
+                <input type="hidden" name="page" value="{{ page }}"/>
                 <input type="hidden" name="pageMulti" value="{{ pageMulti }}"/>
                 <button type="button" class="btn btn-default" onclick="javascript:history.back();">Cancel</button>
                 <button type="submit" class="btn btn-primary">Submit</button>
