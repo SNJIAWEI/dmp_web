@@ -18,7 +18,14 @@
             <div class="form-group">
                 <label class="col-lg-2 control-label">APP标识</label>
                 <div class="col-lg-10">
-                    <p class="form-control-static">{{ app.appName }}</p>
+                    <p class="form-control-static">
+                        <abbr title="点击后面按钮查看App描述">{{ app.appName }}</abbr>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a class="label label-success" href="http://android.myapp.com/myapp/search.htm?kw={{ app.appName }}" target="_blank">应用宝</a>
+                        <a class="label label-info" href="http://zhushou.360.cn/search/index/?kw={{ app.appName }}" target="_blank">360手机助手</a>
+                        <a class="label label-primary" href="http://shouji.baidu.com/s?wd={{ app.appName }}&data_type=app" target="_blank">百度手机</a>
+                        <a class="label label-warning" href="http://app.xiaomi.com/search?keywords={{ app.appName }}" target="_blank">小米应用商店</a>
+                        <a class="label label-danger" href="http://www.anzhi.com/search.php?keyword={{ app.appName }}" target="_blank">安卓市场</a>
+                    </p>
                 </div>
             </div>
             <div class="form-group">
@@ -75,15 +82,14 @@
                         {% dicts_tag '人生阶段' app.appStage %}
                     </select>
                 </div>
-            </div>
-            <br>
+            </div><br>
 
             <div class="modal-footer ">
                 <input type="hidden" name="appId" value="{{ app.id }}"/>
                 <input type="hidden" name="page" value="{{ page }}"/>
                 <input type="hidden" name="pageMulti" value="{{ pageMulti }}"/>
-                <button type="button" class="btn btn-default" onclick="javascript:history.back();">Cancel</button>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-default" onclick="javascript:history.back();">返&nbsp;&nbsp;回</button>&nbsp;&nbsp;
+                <button type="submit" class="btn btn-primary">提&nbsp;&nbsp;交</button>
             </div>
         </form>
     </div>
