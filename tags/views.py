@@ -45,9 +45,11 @@ def app_edit(request):
         pagemulit = request.GET.get("pm", 1)
         if request.GET.get("id", None):
             app_obj = APPInfo.objects.filter(appUsed=1).get(id=request.GET.get("id", None))
+        interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
+        print interest_type_list.count()
     except:
         pass
-    return render(request, "appsedit.html", {'app': app_obj, 'page': page, 'pageMulti': pagemulit})
+    return render(request, "appsedit.html", {'app': app_obj, 'interest_type_list': interest_type_list, 'page': page, 'pageMulti': pagemulit})
 
 """ APP更新 """
 def app_update(request):
