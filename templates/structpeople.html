@@ -13,7 +13,7 @@
         </ul>
     </li>
     <li><a href="#">工具</a></li>
-    <li><a href="#">管理</a></li>
+    <li><a href="/admin" target="_blank">管理</a></li>
 {% endblock %}
 {% block contentPage %}<br><br><br>
     {% load dictLibs %}
@@ -160,13 +160,12 @@
             </div>
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h5 class="modal-title">兴趣偏好</h5>
+                    <h5 class="modal-title">兴趣偏好&nbsp;&nbsp;&nbsp;&nbsp;<label class="label label-warning">注: 树形结构, 请双击子节点添加到右侧!</label></h5>
                 </div>
                 <div class="panel-body">
                     <form class="form-horizontal">
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"
-                                   style="text-align: left;margin-top: 10px;">兴趣分类</label>
+                            <label class="col-sm-2 control-label"style="text-align: left;margin-top: 10px;"><abbr title="">兴趣分类</abbr></label>
                             <div class="radio">
                                 <label class="radio-inline">
                                     <div class="zTreeBackground left">
@@ -275,7 +274,7 @@
             </div>
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h5 class="modal-title">来源</h5>
+                    <h5 class="modal-title">来源&nbsp;&nbsp;&nbsp;&nbsp;<label class="label label-warning">注: 请双击子节点添加到右侧!</label></h5>
                 </div>
                 <div class="panel-body">
                     <form class="form-horizontal">
@@ -343,15 +342,15 @@
                     </form>
                 </div>
             </div>
-
         </div>
-
-
-        <div class="col-md-3 column">
-            这是右边的图形区域
-        </div>
+        <div class="col-md-3 column"></div>
     </div>
 {% endblock %}
+{% block floatRightDiv %}
+    <div id="sidebar" style="width: 400px;background-color: #3f4345; height: 200px; position: absolute; top: 60px; right: 20px;"></div>
+{% endblock %}
+
+
 {% load staticfiles %}
 {% block privateJsAndCss %}
     <script src="http://cdn.bootcss.com/messenger/1.5.0/js/messenger.min.js"></script>
@@ -482,6 +481,11 @@
             $.fn.zTree.init($("#tree_cqdd"), setting, zNodes_cqdd);
             $.fn.zTree.init($("#tree_adfl"), setting, zNodes_adfl);
             $.fn.zTree.init($("#tree_appfl"), setting, zNodes_appfl);
+
+            $(window).scroll(function () {
+                var offsetTop = $(window).scrollTop() + 60 +"px";
+                $("#sidebar").animate({top: offsetTop},{duration: 160, queue: false});
+            });
         });
         function disabledOnoff(ename, onoff) {
             var objs = $("[name='" + ename + "']");

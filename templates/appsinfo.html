@@ -39,7 +39,7 @@
     </ul>
 </li>
 <li><a href="#">工具</a></li>
-<li><a href="#">管理</a></li>
+<li><a href="/admin" target="_blank">管理</a></li>
 {% endblock %}
 
 {% block contentPage %}
@@ -78,7 +78,7 @@
     <tr><!-- success|error|warning|info -->
         <td>{{ app.id }}</td>
         <td title="{{ app.appName }}">{{ app.appName }}</td>
-        <td title="{{ app.appDesc }}">{{ app.appDesc }}</td>
+        <td title="{{ app.appDesc }}"><abbr title="">{{ app.appDesc }}</abbr></td>
         <td>
             {{ app.appType|dict_name:'APP类别' }}
         </td>
