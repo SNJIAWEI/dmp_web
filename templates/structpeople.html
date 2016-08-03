@@ -1,0 +1,503 @@
+{% extends "base.html" %}
+{% block currentNav %}
+    <li><a href="#">总览</a></li>
+    <li class="active"><a href="#">人群构建</a></li>
+    <li><a href="#">人群分析</a></li>
+    <li><a href="#">用户画像</a></li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 数据字典 <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li><a href="/dmp/phoneinfo/">手机标注</a></li>
+            <li><a href="/dmp/appsinfo/">APP标注</a></li>
+            <li><a href="#">位置信息</a></li>
+        </ul>
+    </li>
+    <li><a href="#">工具</a></li>
+    <li><a href="#">管理</a></li>
+{% endblock %}
+{% block contentPage %}<br><br><br>
+    {% load dictLibs %}
+    <div class="row clearfix">
+        <div class="col-md-9 column">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h5 class="modal-title">基本信息</h5>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" style="text-align: left;">性别</label>
+                            {% dict_phone '性别' 'sex' 'radio'%}
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" style="text-align: left;">人生阶段</label>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="stage" id="stage_0" value="0" checked onclick="disabledOnoff('info_stage', 0)"> 不限
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label class="col-sm-2 control-label"></label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="stage" id="stage_1" value="1" onclick="disabledOnoff('info_stage', 1)">自定义&nbsp;&nbsp;
+                                </label>
+                                {% dict_phone '人生阶段' 'info_stage' 'checkbox'%}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" style="text-align: left;">活跃度</label>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="inlineRadioOptions2" id="inlineRadio1" value="option1"
+                                           checked> 不限
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label class="col-sm-2 control-label"></label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="inlineRadioOptions2" id="inlineRadio1" value="option1">自定义&nbsp;&nbsp;
+                                </label>
+                                <label class="radio-inline">
+                                    <input id="hyd" class="range-slider" type="hidden" value="0,0" disabled>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h5 class="modal-title">移动设备</h5>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" style="text-align: left;">手机品牌</label>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="telBrand" id="telBrand_0" value="0" checked onclick="disabledOnoff('ph_brand', 0)"> 不限
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label class="col-sm-2 control-label"></label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="telBrand" id="telBrand_1" value="1" onclick="disabledOnoff('ph_brand', 1)">自定义&nbsp;&nbsp;
+                                </label>
+                                {% dict_phone '手机品牌' 'ph_brand' 'checkbox' %}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" style="text-align: left;">手机价格</label>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="tel_price" id="tel_price_0" value="0" checked onclick="disabledOnoff('ph_price', 0)"> 不限
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label class="col-sm-2 control-label"></label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="tel_price" id="tel_price_1" value="1" onclick="disabledOnoff('ph_price', 1)">自定义&nbsp;&nbsp;
+                                </label>
+                                {% dict_phone '手机价格' 'ph_price' 'checkbox'%}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" style="text-align: left;">操作系统</label>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="sys" id="sys_0" value="0" checked onclick="disabledOnoff('ph_os', 0)"> 不限
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label class="col-sm-2 control-label"></label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="sys" id="sys_1" value="1" onclick="disabledOnoff('ph_os', 1)">自定义&nbsp;&nbsp;
+                                </label>
+                                {% dict_phone '手机操作系统' 'ph_os' 'checkbox'%}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" style="text-align: left;">联网方式</label>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="net" id="net_0" value="0"
+                                           checked onclick="disabledOnoff('ph_net', 0)"> 不限
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label class="col-sm-2 control-label"></label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="net" id="net_1" value="1" onclick="disabledOnoff('ph_net', 1)">自定义&nbsp;&nbsp;
+                                </label>
+                                {% dict_phone '手机联网方式' 'ph_net' 'checkbox'%}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" style="text-align: left;">移动运营商</label>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="bs" id="bs_0" value="0"
+                                           checked onclick="disabledOnoff('ph_operator', 0)"> 不限
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label class="col-sm-2 control-label"></label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="bs" id="bs_1" value="1" onclick="disabledOnoff('ph_operator', 1)">自定义&nbsp;&nbsp;
+                                </label>
+                                {% dict_phone '手机运营商' 'ph_operator' 'checkbox'%}
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h5 class="modal-title">兴趣偏好</h5>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"
+                                   style="text-align: left;margin-top: 10px;">兴趣分类</label>
+                            <div class="radio">
+                                <label class="radio-inline">
+                                    <div class="zTreeBackground left">
+                                        <ul id="tree_xq" class="ztree"></ul>
+                                    </div>
+                                </label>
+                                <label>
+                                    <br><br>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeSelectOptions('tree_xq_r')">&nbsp;删除&nbsp;</button>
+                                    <br>
+                                </label>
+                                <label class="checkbox-inline">
+                                    <select id="tree_xq_r" name="tree_xq_r" multiple class="form-control" style="width: 200px; height: 220px;">
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"
+                                   style="text-align: left; margin-top: 10px;">视频关键字</label>
+                            <div class="radio">
+                                <label class="col-sm-8 radio-inline">
+                                    <input type="text" class="form-control" placeholder="Keywords">&nbsp;&nbsp;
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"
+                                   style="text-align: left;margin-top: 10px;">常去地点</label>
+                            <div class="radio">
+                                <label class="radio-inline">
+                                    <div class="zTreeBackground left">
+                                        <ul id="tree_cqdd" class="ztree"></ul>
+                                    </div>
+                                </label>
+                                <label>
+                                    <br><br>
+                                    <button type="button" class="btn btn-danger btn-sm">&nbsp;删除&nbsp;</button>
+                                    <br>
+                                </label>
+                                <label class="checkbox-inline">
+                                    <select multiple class="form-control" style="width: 200px; height: 220px;">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"
+                                   style="text-align: left;margin-top: 10px;">广告分类</label>
+                            <div class="radio" style="margin-left: 10px;">
+                                <label class="radio-inline">
+                                    <div class="zTreeBackground left">
+                                        <ul id="tree_adfl" class="ztree"></ul>
+                                    </div>
+                                </label>
+                                <label>
+                                    <br><br>
+                                    <button type="button" class="btn btn-danger btn-sm">&nbsp;删除&nbsp;</button>
+                                </label>
+                                <label class="checkbox-inline">
+                                    <select multiple class="form-control" style="width: 200px; height: 220px;">
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                        <option>4</option>
+                                        <option>5</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" style="text-align: left;">权重</label>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="inlineRadioOptionsxx" id="inlineRadio1" value="option1"
+                                           checked> 不限
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label class="col-sm-2 control-label"></label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="inlineRadioOptionsxx" id="inlineRadio1" value="option1">自定义&nbsp;&nbsp;
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="inlineRadioOptions" id="inlineRadio2" value="option2">普通&nbsp;
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="inlineRadioOptions" id="inlineRadio3" value="option3">中&nbsp;&nbsp;
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="inlineRadioOptions" id="inlineRadio3" value="option3">高&nbsp;&nbsp;
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h5 class="modal-title">来源</h5>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label"
+                                   style="text-align: left;margin-top: 10px;">应用分类</label>
+                            <div class="radio">
+                                <label class="radio-inline">
+                                    <div class="zTreeBackground left">
+                                        <ul id="tree_appfl" class="ztree"></ul>
+                                    </div>
+                                </label>
+                                <label>
+                                    <br><br>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeSelectOptions('tree_appfl_r')">&nbsp;删除&nbsp;</button>
+                                </label>
+                                <label class="checkbox-inline">
+                                    <select id="tree_appfl_r" name="tree_appfl_r" multiple class="form-control" style="width: 200px; height: 220px;">
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" style="text-align: left;">渠道</label>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="way" id="way_0" value="0"
+                                           checked onclick="disabledOnoff('chnel', 0)"> 不限
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label class="col-sm-2 control-label"></label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="way" id="way_1" value="1" onclick="disabledOnoff('chnel', 1)">自定义&nbsp;&nbsp;
+                                </label>
+                                {% dict_phone '渠道' 'chnel' 'checkbox'%}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" style="text-align: left;">区域</label>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="area" id="area_0" value="0"
+                                           checked onclick="disabledOnoff('prov', 0)"> 不限
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label class="col-sm-2 control-label"></label>
+                                <label class="radio-inline" style="height: 245px;">
+                                    <input type="radio" name="area" id="area_1" value="1" onclick="disabledOnoff('prov', 1)">省市&nbsp;&nbsp;
+                                </label>
+                                <label class="checkbox-inline">
+                                    <select multiple class="form-control" name="prov" style="width: 200px; height: 220px;" disabled>
+                                        <option>北京</option>
+                                        <option>上海</option>
+                                        <option>河北</option>
+                                        <option>河南</option>
+                                        <option>天津</option>
+                                    </select>&nbsp;
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="col-md-3 column">
+            这是右边的图形区域
+        </div>
+    </div>
+{% endblock %}
+{% load staticfiles %}
+{% block privateJsAndCss %}
+    <script src="http://cdn.bootcss.com/messenger/1.5.0/js/messenger.min.js"></script>
+    <link href="http://cdn.bootcss.com/messenger/1.5.0/css/messenger.css" rel="stylesheet">
+    <link href="http://cdn.bootcss.com/messenger/1.5.0/css/messenger-theme-future.css" rel="stylesheet">
+    <script>
+        $._messengerDefaults = {
+            extraClasses: 'messenger-fixed messenger-theme-future messenger-on-top messenger-on-right'
+        }
+    </script>
+
+    <link rel="stylesheet" href="{% static "jRange/jquery.range.css" %}">
+    <script src="{% static "jRange/jquery.range-min.js" %}"></script>
+    <link rel="stylesheet" href="{% static "zTree/zTreeStyle.css" %}">
+    <script src="{% static "zTree/jquery.ztree.core.min.js" %}"></script>
+    <style type="text/css">
+        .panel-body {
+            font-size: 13px;
+            text-align: left;
+            color: #363636;
+        }
+
+        .control-label {
+            text-align: left;
+            font-weight: normal;
+        }
+
+        .col-sm-2 {
+            text-align: left;
+            font-weight: normal;
+        }
+
+        div.zTreeBackground {
+            width: 200px;
+            height: 222px;
+            text-align: left;
+        }
+
+        ul.ztree {
+            margin-top: 2px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            background: #FFFFFF;
+            width: 200px;
+            height: 220px;
+            overflow-y: scroll;
+            overflow-x: auto;
+        }
+    </style>
+
+{% endblock %}
+{% block bottomJscript %}
+    <script type="text/javascript">
+        var setting = {
+            view: {
+                showIcon: false, showLine: true, dblClickExpand: false
+            },
+            callback: {
+                onClick: function (e, treeId, treeNode) {
+                    if (treeNode.pId == 0) {
+                        var zTree = $.fn.zTree.getZTreeObj(treeId);
+                        zTree.expandNode(treeNode);
+                    } else {
+                        return false;
+                    }
+                },
+                onDblClick: function (e, treeId, treeNode) {
+                    if (treeNode.id>0 || treeNode.id!='0'){
+                        var has_option = false;
+                        $("#"+treeId+"_r"+" option").each(function () {
+                            if ($("#"+treeId+"_r"+" option:contains("+treeNode.name+")").length > 0){
+                                has_option = true;
+                                return false;
+                            }
+                        });
+                        if (!has_option){
+                            $("#"+treeId+"_r").append("<option value='"+treeNode.id+"'>"+treeNode.name+"</option>");
+                        }else{
+                            $.globalMessenger().post({message: "该节点已添加,请勿重复添加!", type: "error", showCloseButton: false, hideAfter: 3, hideOnNavigate: true});
+                        }
+                    }
+                }
+            }
+        };
+        var zNodes_xq = [{% for v in interest_type_dict.values %}{{ v|safe }}{% endfor %}];
+        var zNodes_cqdd = [
+                {id: 0, name: "酒店", open: false,children: [
+                    {id: 21, name: "x"},]},
+                {id: 0, name: "餐厅", open: false,children: [
+                    {id: 21, name: "x"},]},
+                {id: 0, name: "教育培训", open: false,children: [
+                    {id: 21, name: "x"},]},
+                {id: 0, name: "住宅小区", open: false,children: [
+                    {id: 21, name: "x"},]},
+                {id: 0, name: "旅游景区", open: false,children: [
+                    {id: 21, name: "x"},]},
+        ];
+        var zNodes_adfl = [
+                {id: 0, name: "房产", open: false,children: [
+                    {id: 21, name: "x"},]},
+                {id: 0, name: "金融", open: false,children: [
+                    {id: 21, name: "x"},]},
+                {id: 0, name: "游戏", open: false,children: [
+                    {id: 21, name: "x"},]},
+        ];
+        var zNodes_appfl = [
+            {% for app_type_dict in app_type_list %}
+                {id: "{{ app_type_dict.dictId }}", name: "{{ app_type_dict.dictName }}", open: false,},
+            {% endfor %}
+        ];
+        $(document).ready(function () {
+            $(".range-slider").jRange({
+                from: 0,
+                to: 1000,
+                step: 1,
+                scale: [0, 1000],
+                format: '%s',
+                width: 400,
+                showLabels: true,
+                isRange: true,
+                theme: 'theme-blue',
+                ondragend: function () {
+                    alert($("#hyd").val());
+                }
+            });
+
+            $.fn.zTree.init($("#tree_xq"), setting, zNodes_xq);
+            $.fn.zTree.init($("#tree_cqdd"), setting, zNodes_cqdd);
+            $.fn.zTree.init($("#tree_adfl"), setting, zNodes_adfl);
+            $.fn.zTree.init($("#tree_appfl"), setting, zNodes_appfl);
+        });
+        function disabledOnoff(ename, onoff) {
+            var objs = $("[name='" + ename + "']");
+            if (onoff) {
+                objs.each(function () {
+                    $(this).removeAttr("disabled");
+                });
+            } else {
+                objs.each(function () {
+                    $(this).prop("checked", false);
+                    $(this).attr("disabled", true);
+                });
+            }
+        }
+        function removeSelectOptions(selectId) {
+            $("#"+selectId+" option:selected").remove();
+        }
+    </script>
+{% endblock %}

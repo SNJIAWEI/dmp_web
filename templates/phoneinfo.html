@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block privateJsAndCss %}
+<script src="http://cdn.bootcss.com/messenger/1.5.0/js/messenger.min.js"></script>
+<link href="http://cdn.bootcss.com/messenger/1.5.0/css/messenger.css" rel="stylesheet">
+<link href="http://cdn.bootcss.com/messenger/1.5.0/css/messenger-theme-future.css" rel="stylesheet">
+<script>
+    $._messengerDefaults = {
+        extraClasses: 'messenger-fixed messenger-theme-future messenger-on-top messenger-on-right'
+    }
+</script>
+<style type="text/css">
+    body {
+        padding-top: 70px;
+    }
+    table {
+        table-layout: fixed;
+    }
+    table tr td {
+        font-size: 12px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;/* IE */
+        -moz-text-overflow: ellipsis;/* Firefox,mozilla */
+    }
+</style>
+{% endblock %}
+
+{% block currentNav %}
+<li><a href="#">总览</a></li>
+<li><a href="/dmp/structmans/">人群构建</a></li>
+<li><a href="#">人群分析</a></li>
+<li><a href="#">用户画像</a></li>
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 数据字典 <b class="caret"></b></a>
+    <ul class="dropdown-menu">
+        <li class="active"><a href="#">手机标注</a></li>
+        <li><a href="/dmp/appsinfo/">APP标注</a></li>
+        <li><a href="#">位置信息</a></li>
+    </ul>
+</li>
+<li><a href="#">工具</a></li>
+<li><a href="#">管理</a></li>
+{% endblock %}
+
+{% block contentPage %}
+{% for msg in messages %}
+    {% ifequal msg.message 'success' %}
+        <script>
+        $.globalMessenger().post({message: "Successfully !", type: "success", showCloseButton: false, hideAfter: 3, hideOnNavigate: true});
+        </script>
+    {% else %}
+        <script>
+        $.globalMessenger().post({message: "Update failed ! please try again !", type: "error", showCloseButton: false, hideAfter: 3, hideOnNavigate: true});
+        </script>
+    {% endifequal %}
+{% endfor %}
+
+{% load dictLibs %}
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th width="8%">序号</th>
+        <th>手机标识</th>
+        <th>品牌</th>
+        <th>价格</th>
+        <th>流量</th>
+        <th>流量占比</th>
+        <th width="10%">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for tel in phones %}
+    <tr><!-- success|error|warning|info -->
+        <td>{{ tel.id }}</td>
+        <td title="{{ tel.phoneName }}">{{ tel.phoneName }}</td>
+        <td title="{{ tel.phoneBrand }}">
+            {{ tel.phoneBrand|dict_name:'手机品牌' }}
+        </td>
+        <td>
+            {{ tel.phonePrice|dict_name:'手机价格' }}
+        </td>
+        <td>{{ tel.phoneFlux }}</td>
+        <td>{{ tel.phoneFluxPer }}</td>
+        <td>
+            <a href="/dmp/phoneinfo/edit/?id={{ tel.id }}&&p={{ phones.number }}&&pm={{ pageMulti }}" role="button" data-toggle="modal">编辑</a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<nav>
+  <ul class="pagination">
+      {% if pageMulti > 1 %}
+          <li>
+            <a href="?page={% widthratio pageMulti|add:-1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'-1' }}" aria-label="Previous">
+            <span aria-hidden="true">Previous</span>
+            </a>
+          </li>
+      {% endif %}
+
+    {% for page in page_curt_range %}
+    {% if page %}
+    {% ifequal page phones.number %}
+        <li class="active"><a href="#">{{ page }}</a></li>
+    {% else %}
+        <li><a href="?page={{ page }}&&pageMulti={{ pageMulti }}">{{ page }}</a></li>
+    {% endifequal %}
+    {% endif %}
+    {% endfor %}
+
+    {% if has_next %}
+        <li>
+            <a href="?page={% widthratio pageMulti|add:1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'1'}}" aria-label="Next">
+            <span aria-hidden="true">Next</span>
+            </a>
+        </li>
+    {% endif %}
+  </ul>Page {{ phones.number }} of {{ phones.paginator.num_pages }}.
+</nav>
+{% endblock %}

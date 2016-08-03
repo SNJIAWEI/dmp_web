@@ -1,0 +1,3 @@
+{% for dict in dict_list %}
+    <option value="{{ dict.dictId }}" {% ifequal selected dict.dictId %}selected{% endifequal %}>{{ dict.dictName }}</option>
+{% endfor %}
