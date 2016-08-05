@@ -35,7 +35,9 @@
     <ul class="dropdown-menu">
         <li class="active"><a href="#">手机标注</a></li>
         <li><a href="/dmp/appsinfo/">APP标注</a></li>
-        <li><a href="#">位置信息</a></li>
+        <li><a href="/dmp/locations/">位置信息</a></li>
+        <li><a href="/dmp/ads/">广告信息</a></li>
+        <li><a href="/dmp/interest/">兴趣映射</a></li>
     </ul>
 </li>
 <li><a href="#">工具</a></li>
@@ -72,7 +74,7 @@
     <tbody>
     {% for tel in phones %}
     <tr><!-- success|error|warning|info -->
-        <td>{{ tel.id }}</td>
+        <td>{% current_index forloop.counter one_page_num  phones.number%}</td>
         <td title="{{ tel.phoneName }}">{{ tel.phoneName }}</td>
         <td title="{{ tel.phoneBrand }}">
             {{ tel.phoneBrand|dict_name:'手机品牌' }}
@@ -80,8 +82,8 @@
         <td>
             {{ tel.phonePrice|dict_name:'手机价格' }}
         </td>
-        <td>{{ tel.phoneFlux }}</td>
-        <td>{{ tel.phoneFluxPer }}</td>
+        <td>{{ tel.phoneFlux|floatformat:0 }}</td>
+        <td>{{ tel.phoneFluxPer|floatformat:5 }}%</td>
         <td>
             <a href="/dmp/phoneinfo/edit/?id={{ tel.id }}&&p={{ phones.number }}&&pm={{ pageMulti }}" role="button" data-toggle="modal">编辑</a>
         </td>
@@ -94,7 +96,7 @@
       {% if pageMulti > 1 %}
           <li>
             <a href="?page={% widthratio pageMulti|add:-1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'-1' }}" aria-label="Previous">
-            <span aria-hidden="true">Previous</span>
+            <span aria-hidden="true">上一页</span>
             </a>
           </li>
       {% endif %}
@@ -112,10 +114,11 @@
     {% if has_next %}
         <li>
             <a href="?page={% widthratio pageMulti|add:1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'1'}}" aria-label="Next">
-            <span aria-hidden="true">Next</span>
+            <span aria-hidden="true">下一页</span>
             </a>
         </li>
     {% endif %}
-  </ul>Page {{ phones.number }} of {{ phones.paginator.num_pages }}.
+  <li><label class="label label-primary" style="margin-left: 50px;font-size: 12px;">当前第 {{ phones.number }} 页, 总 {{ phones.paginator.num_pages }} 页。</label></li>
+  </ul>
 </nav>
 {% endblock %}
