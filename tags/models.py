@@ -25,7 +25,7 @@ class APPInfo(models.Model):
 class PhoneInfo(models.Model):
     phoneName = models.CharField(max_length=68, blank=True)
     phoneBrand = models.CharField(max_length=68, blank=True, null=True)
-    phonePrice = models.IntegerField(default=0, blank=True, null=True)
+    phonePrice = models.CharField(max_length=68, blank=True, null=True)
     phoneFlux = models.FloatField(default=0.0, blank=True, null=True)
     phoneFluxPer = models.FloatField(default=0.0, blank=True, null=True)
     isUsed = models.IntegerField(default=1, blank=True, null=True)
@@ -47,3 +47,16 @@ class DMPDict(models.Model):
 
     def __str__(self):
         return str(self.dictId) + "," + self.dictName + "," + self.dictType+"," + str(self.isUsed)
+
+
+@python_2_unicode_compatible
+class LocationInfo(models.Model):
+    location = models.CharField(max_length=68, blank=True)
+    locationStage = models.CharField(max_length=68, blank=True)
+    locationInterest = models.CharField(max_length=68, blank=True)
+    locationFlux = models.FloatField(default=0.0, blank=True, null=True)
+    locationFluxPer = models.FloatField(default=0.0, blank=True, null=True)
+    isUsed = models.IntegerField(default=1, blank=True, null=True)
+
+    def __str__(self):
+        return self.location

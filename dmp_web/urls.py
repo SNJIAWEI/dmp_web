@@ -20,12 +20,20 @@ import tags.views as dmp
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^dmp/appsinfo/$', dmp.appsinfo),
+    url(r'^dmp/appsinfo/$', dmp.appsinfo_main),
     url(r'^dmp/appsinfo/edit/$', dmp.app_edit),
     url(r'^dmp/appsinfo/update/$', dmp.app_update),
-    url(r'^dmp/phoneinfo/$', dmp.phone_list),
+
+    url(r'^dmp/phoneinfo/$', dmp.phoneinfo_main),
     url(r'^dmp/phoneinfo/edit/$', dmp.phone_edit),
     url(r'^dmp/phoneinfo/update/$', dmp.phone_update),
 
-    url(r'^dmp/structmans/', dmp.struct_people),
+    url(r'^dmp/structmans/$', dmp.struct_people_main),
+
+    url(r'^dmp/locations/$', dmp.locations_main),
+    url(r'^dmp/locations/edit/$', dmp.locations_edit),
+    url(r'^dmp/locations/update/$', dmp.locations_update),
+
+    url(r'^dmp/ads/$', dmp.ads_main),
+    url(r'^dmp/interest/$', dmp.interest_main),
 ]

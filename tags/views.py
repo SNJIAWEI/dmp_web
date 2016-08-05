@@ -3,23 +3,39 @@ from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, InvalidPage
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from tags.models import APPInfo, DMPDict, PhoneInfo
+from tags.models import APPInfo, DMPDict, PhoneInfo, LocationInfo
 
 # Create your views here.
 one_page_num = 15
 
 """ APP查询 """
-def appsinfo(request):
+def appsinfo_main(request):
+    page = 1
+    page_multi = 1
+    searchAppType = ''
+    searchAppName = ''
     try:
-        page = int(request.GET.get('page', '1'))
-        page_multi = int(request.GET.get('pageMulti', '1'))
-        if page < 1:
-            page = 1
-    except ValueError:
+        if request.method == 'GET':
+            page = int(request.GET.get('page', '1'))
+            page_multi = int(request.GET.get('pageMulti', '1'))
+            searchAppType = request.GET.get('q', '')
+            searchAppName = request.GET.get('appn', '')
+            if page < 1:
+                page = 1
+        if request.method == 'POST':
+            searchAppType = str(request.POST['q'])
+            searchAppName = request.POST['appn']
+    except:
         page = 1
         page_multi = 1
+        searchAppType = ''
 
-    apps_list = APPInfo.objects.filter(appUsed=1).order_by("id")
+    apps_list = APPInfo.objects.filter(appUsed=1).order_by("-appFluxPer")
+    if len(searchAppType) > 0:
+        apps_list = apps_list.filter(appType__in=searchAppType.split(","))
+    if len(searchAppName) > 0:
+        apps_list = apps_list.filter(appName__contains=searchAppName)
+
     paginator = Paginator(apps_list, 15)
     try:
         apps_page = paginator.page(page)
@@ -36,6 +52,7 @@ def appsinfo(request):
         page_curt_range = range((page_multi - 1)*one_page_num+1, paginator.num_pages+1)
         has_next = False
     return render(request, 'appsinfo.html', {'apps': apps_page, 'page_curt_range': page_curt_range,
+                                             'search_value': searchAppType, 'search_appn': searchAppName,
                                              'pageMulti': page_multi, 'one_page_num': one_page_num, 'has_next': has_next})
 
 """ APP编辑 """
@@ -43,18 +60,22 @@ def app_edit(request):
     try:
         page = request.GET.get("p", 1)
         pagemulit = request.GET.get("pm", 1)
+        search_value = request.GET.get('q', 1)
+        search_appn = request.GET.get('appn', '')
         if request.GET.get("id", None):
             app_obj = APPInfo.objects.filter(appUsed=1).get(id=request.GET.get("id", None))
         interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
-        print interest_type_list.count()
     except:
         pass
-    return render(request, "appsedit.html", {'app': app_obj, 'interest_type_list': interest_type_list, 'page': page, 'pageMulti': pagemulit})
+    return render(request, "appsedit.html", {'app': app_obj, 'interest_type_list': interest_type_list,
+                                             'page': page, 'pageMulti': pagemulit, 'search_value': search_value, 'search_appn':search_appn})
 
 """ APP更新 """
 def app_update(request):
     if request.method == 'POST':
         try:
+            search_value = request.POST['q']
+            search_appn = request.POST['appn']
             page = int(request.POST['page'])
             pageMulti = int(request.POST['pageMulti'])
             appInfo_obj = APPInfo.objects.get(id=request.POST['appId'])
@@ -74,11 +95,11 @@ def app_update(request):
     else:
         result = 'error'
     messages.success(request, result)
-    return HttpResponseRedirect("/dmp/appsinfo/?page="+str(page)+"&&pageMulti="+str(pageMulti))
+    return HttpResponseRedirect("/dmp/appsinfo/?page="+str(page)+"&&pageMulti="+str(pageMulti)+"&&q="+str(search_value)+"&&appn="+unicode(search_appn))
 
 
 """ 手机标注 - 列表页 """
-def phone_list(request):
+def phoneinfo_main(request):
     try:
         page = int(request.GET.get('page', '1'))
         page_multi = int(request.GET.get('pageMulti', '1'))
@@ -88,7 +109,7 @@ def phone_list(request):
         page = 1
         page_multi = 1
 
-    telphone_list = PhoneInfo.objects.filter(isUsed=1).order_by("id")
+    telphone_list = PhoneInfo.objects.filter(isUsed=1).order_by("-phoneFluxPer")
     paginator = Paginator(telphone_list, 15)
     try:
         telphone_page = paginator.page(page)
@@ -143,9 +164,11 @@ def phone_update(request):
     return HttpResponseRedirect("/dmp/phoneinfo/?page=" + str(page) + "&&pageMulti=" + str(pageMulti))
 
 
-def struct_people(request):
+""" 人群构建 """
+def struct_people_main(request):
     app_type_list = DMPDict.objects.filter(isUsed=1, dictType='APP类别').order_by("dictId")
     interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
+    prov_city_list = DMPDict.objects.filter(isUsed=1, dictType='省市').order_by("dictId")
 
     tree_xq_dict = {}
     tree_xq_node_dict = {}
@@ -167,4 +190,90 @@ def struct_people(request):
             tree_xq_dict[k] = v.replace("temp_children", tree_xq_node_dict.get(k))
         else:
             tree_xq_dict[k] = v.replace("children:[temp_children]", "")
-    return render(request, "structpeople.html",{"app_type_list": app_type_list, "interest_type_dict": tree_xq_dict})
+    return render(request, "structpeople.html",{"app_type_list": app_type_list,
+                                                "interest_type_dict": tree_xq_dict,
+                                                "prov_city_list": prov_city_list})
+
+
+""" 标签管理 - 位置信息 """
+def locations_main(request):
+    locations_dict = DMPDict.objects.filter(dictType='常去地点')
+    locations_list = LocationInfo.objects.all()
+    len_locations_list = locations_list.count()
+
+    if len_locations_list == 0:
+        locations_batch = []
+        for ld in locations_dict.filter(isUsed=1):
+            locations_batch.append(LocationInfo(location=ld.dictId))
+        LocationInfo.objects.bulk_create(locations_batch)
+
+        locations_list = locations_list.order_by("-locationFluxPer")
+    else:
+        location_unused_dict = locations_dict.filter(isUsed=0)
+        if location_unused_dict.count() > 0:
+            for lud in location_unused_dict:
+                try:
+                    LocationInfo.objects.get(lud.dictId).delete()
+                except:
+                    pass
+        else:
+            location_used_dict = locations_dict.filter(isUsed=1)
+            if location_used_dict.count() > len_locations_list:
+                locations_batch = []
+                for ld in location_used_dict:
+                    if locations_list.filter(location=ld.dictId).count() == 0:
+                        locations_batch.append(LocationInfo(location=ld.dictId))
+                    else:
+                        pass
+                LocationInfo.objects.bulk_create(locations_batch)
+            else:
+                pass
+            locations_list = locations_list.order_by("-locationFluxPer")
+    return render(request, "locations.html", {"locations": locations_list})
+
+
+"""
+    标签管理 - 位置信息 [编辑]
+"""
+def locations_edit(request):
+    location_obj = ''
+    try:
+        if request.method == 'GET':
+            locationId = request.GET.get('id', None)
+            print locationId
+            location_obj = LocationInfo.objects.get(id=locationId)
+            print '====', location_obj.location
+    except Exception, ex:
+        print ex
+    interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
+    return render(request, "locatedit.html", {'interest_type_list': interest_type_list, 'location_obj': location_obj})
+
+
+"""
+    标签管理 - 位置信息 [编辑-保存]
+"""
+def locations_update(request):
+    try:
+        if request.method == 'POST':
+            locat_obj = LocationInfo.objects.get(id=request.POST['locationId'])
+            locat_obj.locationStage = request.POST['locationStage']
+            locat_obj.locationInterest = request.POST['locationInterest']
+
+            locat_obj.save()
+            result = "success"
+        else:
+            result = "error"
+    except Exception, ex:
+        print ex
+        result = "error"
+    messages.success(request, result)
+    return HttpResponseRedirect("/dmp/locations/")
+
+""" 标签管理 - 广告信息 """
+def ads_main(request):
+    return render(request, "adsinfo.html")
+
+
+""" 标签管理 - 兴趣映射 """
+def interest_main(request):
+    return render(request, "interestinfo.html")

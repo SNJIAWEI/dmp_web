@@ -35,9 +35,9 @@
     <ul class="dropdown-menu">
         <li><a href="/dmp/phoneinfo/">手机标注</a></li>
         <li><a href="/dmp/appsinfo/">APP标注</a></li>
-        <li class="active"><a href="/dmp/locations/">位置信息</a></li>
+        <li><a href="/dmp/locations/">位置信息</a></li>
 {#        <li><a href="/dmp/ads/">广告信息</a></li>#}
-        <li><a href="/dmp/interest/">兴趣映射</a></li>
+        <li class="active"><a href="/dmp/interest/">兴趣映射</a></li>
     </ul>
 </li>
 <li><a href="#">工具</a></li>
@@ -63,39 +63,65 @@
     <thead>
     <tr>
         <th width="6%">序号</th>
-        <th width="10%">编码</th>
-        <th width="28%">GEO位置</th>
-        <th>人生状态</th>
         <th>兴趣分类</th>
-        <th>流量</th>
-        <th>流量占比</th>
+        <th>优酷频道</th>
+        <th>爱奇艺平台</th>
+        <th>PPTV</th>
+        <th>搜狐</th>
         <th width="8%">操作</th>
     </tr>
     </thead>
     <tbody>
-    {% for lc in locations %}
+    {% for app in apps %}
+
     <tr><!-- success|error|warning|info -->
         <td>{{ forloop.counter}}</td>
-        <td>{{ lc.location }}</td>
-        <td title="{{ lc.location }}">
-            {% ifequal lc.location|length 9 %}
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|--
-            {% endifequal %}
-            {{ lc.location|dict_name:'常去地点'}}</td>
+        <td title="{{ app.appName }}">{{ app.appName }}</td>
         <td>
-            {{ lc.locationStage|dict_name:'人生阶段' }}
+            {{ app.appStage|dict_name:'人生阶段' }}
         </td>
         <td>
-            {{ lc.locationInterest|dict_name:'兴趣分类' }}
+            {{ app.appBssIntr|dict_name:'兴趣分类' }}
         </td>
-        <td>{{ lc.locationFlux|floatformat:0 }}</td>
-        <td>{{ lc.locationFluxPer|floatformat:5 }}%</td>
+        <td>{{ app.appFlux|floatformat:0 }}</td>
+        <td>{{ app.appFluxPer|floatformat:5 }}%</td>
         <td>
-            <a href="/dmp/locations/edit/?id={{ lc.id }}" role="button" data-toggle="modal">编辑</a>
+            <a href="/dmp/locations/edit/?id={{ app.id }}&&p={{ apps.number }}&&pm={{ pageMulti }}" role="button" data-toggle="modal">编辑</a>
         </td>
     </tr>
     {% endfor %}
     </tbody>
 </table>
+<nav>
+  <ul class="pagination">
+      {% if pageMulti > 1 %}
+          <li>
+            <a href="?page={% widthratio pageMulti|add:-1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'-1' }}" aria-label="Previous">
+            <span aria-hidden="true">上一页</span>
+            </a>
+          </li>
+      {% endif %}
+
+    {% for page in page_curt_range %}
+    {% if page %}
+    {% ifequal page apps.number %}
+        <li class="active"><a href="#">{{ page }}</a></li>
+    {% else %}
+        <li><a href="?page={{ page }}&&pageMulti={{ pageMulti }}">{{ page }}</a></li>
+    {% endifequal %}
+    {% endif %}
+    {% endfor %}
+
+    {% if has_next %}
+        <li>
+            <a href="?page={% widthratio pageMulti|add:1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'1'}}" aria-label="Next">
+            <span aria-hidden="true">下一页</span>
+            </a>
+        </li>
+    {% endif %}
+    <li><label class="label label-primary" style="margin-left: 50px;font-size: 12px;">当前第 {{ apps.number }} 页, 总 {{ apps.paginator.num_pages }} 页。</label></li>
+  </ul>
+  <ul></ul>
+</nav>
 
 {% endblock %}
