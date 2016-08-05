@@ -39,6 +39,7 @@
                 <label for="maxOption2" class="col-lg-2 control-label">兴趣分类</label>
                 <div class="col-lg-10">
                     <select id="basic" name="appBssIntr" class="selectpicker show-tick form-control" data-live-search="true">
+                        <option value="0">未知</option>
                         {% for type in interest_type_list %}
                             {% if type.dictId|length == 5 and forloop.first%}
                             <optgroup label="{{ type.dictName }}" >
@@ -53,9 +54,7 @@
                                     </optgroup>
                                 {% endif %}
                             {% endif %}
-
                         {% endfor %}
-
                     </select>
                 </div>
             </div>
@@ -76,7 +75,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="inputPassword3" class="col-lg-2 control-label">人生阶段</label>
+                <label for="inputPassword3" class="col-lg-2 control-label">人生状态</label>
                 <div class="col-lg-10">
                     <select id="appStage_{{ app.id }}" class="form-control" name="appStage">
                         {% dicts_tag '人生阶段' app.appStage %}
@@ -85,6 +84,8 @@
             </div><br>
 
             <div class="modal-footer ">
+                <input type="hidden" name="q" value="{{ search_value }}"/>
+                <input type="hidden" name="appn" value="{{ search_appn }}"/>
                 <input type="hidden" name="appId" value="{{ app.id }}"/>
                 <input type="hidden" name="page" value="{{ page }}"/>
                 <input type="hidden" name="pageMulti" value="{{ pageMulti }}"/>
