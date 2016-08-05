@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block privateJsAndCss %}
+<script src="http://cdn.bootcss.com/messenger/1.5.0/js/messenger.min.js"></script>
+<link href="http://cdn.bootcss.com/messenger/1.5.0/css/messenger.css" rel="stylesheet">
+<link href="http://cdn.bootcss.com/messenger/1.5.0/css/messenger-theme-future.css" rel="stylesheet">
+<script>
+    $._messengerDefaults = {
+        extraClasses: 'messenger-fixed messenger-theme-future messenger-on-top messenger-on-right'
+    }
+</script>
+<style type="text/css">
+    body {
+        padding-top: 70px;
+    }
+    table {
+        table-layout: fixed;
+    }
+    table tr td {
+        font-size: 12px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;/* IE */
+        -moz-text-overflow: ellipsis;/* Firefox,mozilla */
+    }
+</style>
+{% endblock %}
+
+{% block currentNav %}
+<li><a href="#">总览</a></li>
+<li><a href="/dmp/structmans/">人群构建</a></li>
+<li><a href="#">人群分析</a></li>
+<li><a href="#">用户画像</a></li>
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 数据字典 <b class="caret"></b></a>
+    <ul class="dropdown-menu">
+        <li><a href="/dmp/phoneinfo/">手机标注</a></li>
+        <li><a href="/dmp/appsinfo/">APP标注</a></li>
+        <li class="active"><a href="/dmp/locations/">位置信息</a></li>
+        <li><a href="/dmp/ads/">广告信息</a></li>
+        <li><a href="/dmp/interest/">兴趣映射</a></li>
+    </ul>
+</li>
+<li><a href="#">工具</a></li>
+<li><a href="/admin" target="_blank">管理</a></li>
+{% endblock %}
+
+{% block contentPage %}
+{% for msg in messages %}
+    {% ifequal msg.message 'success' %}
+        <script>
+        $.globalMessenger().post({message: "Successfully !", type: "success", showCloseButton: false, hideAfter: 3, hideOnNavigate: true});
+        </script>
+    {% else %}
+        <script>
+        $.globalMessenger().post({message: "Update failed ! please try again !", type: "error", showCloseButton: false, hideAfter: 3, hideOnNavigate: true});
+        </script>
+    {% endifequal %}
+{% endfor %}
+
+{% load dictLibs %}
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th width="6%">序号</th>
+        <th width="10%">编码</th>
+        <th width="28%">GEO位置</th>
+        <th>人生状态</th>
+        <th>兴趣分类</th>
+        <th>流量</th>
+        <th>流量占比</th>
+        <th width="8%">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for lc in locations %}
+    <tr><!-- success|error|warning|info -->
+        <td>{{ forloop.counter}}</td>
+        <td>{{ lc.location }}</td>
+        <td title="{{ lc.location }}">
+            {% ifequal lc.location|length 9 %}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|--
+            {% endifequal %}
+            {{ lc.location|dict_name:'常去地点'}}</td>
+        <td>
+            {{ lc.locationStage|dict_name:'人生阶段' }}
+        </td>
+        <td>
+            {{ lc.locationInterest|dict_name:'兴趣分类' }}
+        </td>
+        <td>{{ lc.locationFlux|floatformat:0 }}</td>
+        <td>{{ lc.locationFluxPer|floatformat:5 }}%</td>
+        <td>
+            <a href="/dmp/locations/edit/?id={{ lc.id }}" role="button" data-toggle="modal">编辑</a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
