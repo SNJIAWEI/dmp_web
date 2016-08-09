@@ -274,10 +274,14 @@ def locations_edit(request):
         if request.method == 'GET':
             locationId = request.GET.get('id', None)
             location_obj = LocationInfo.objects.get(id=locationId)
+            anchor = request.GET.get('m', 0)
     except Exception, ex:
+        location_obj = ''
+        anchor = 0
         print ex
     interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
-    return render(request, "locatedit.html", {'interest_type_list': interest_type_list, 'location_obj': location_obj})
+    return render(request, "locatedit.html", {'interest_type_list': interest_type_list,
+                                              'location_obj': location_obj, 'anchor':anchor})
 
 
 """
@@ -300,7 +304,7 @@ def locations_update(request):
         print ex
         result = "error"
     messages.success(request, result)
-    return HttpResponseRedirect("/dmp/locations/")
+    return HttpResponseRedirect("/dmp/locations/#"+request.POST['m'])
 
 
 """ 标签管理 - 广告信息 """

@@ -60,7 +60,7 @@
     <tbody>
     {% for lc in locations %}
     <tr><!-- success|error|warning|info -->
-        <td>{{ forloop.counter}}</td>
+        <td><a id="{{ forloop.counter|add:2}}" name="{{ forloop.counter|add:2 }}"></a>{{ forloop.counter}}</td>
         <td>{{ lc.location }}</td>
         <td title="{{ lc.location }}">
             {% ifequal lc.location|length 9 %}
@@ -76,7 +76,7 @@
         <td>{{ lc.locationFlux|floatformat:0 }}</td>
         <td>{{ lc.locationFluxPer|floatformat:5 }}%</td>
         <td>
-            <a href="/dmp/locations/edit/?id={{ lc.id }}" role="button" data-toggle="modal">编辑</a>
+            <a href="/dmp/locations/edit/?id={{ lc.id }}&&m={{ forloop.counter }}" role="button" data-toggle="modal">编辑</a>
         </td>
     </tr>
     {% endfor %}
