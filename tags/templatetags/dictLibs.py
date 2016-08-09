@@ -28,11 +28,29 @@ register.inclusion_tag("phchbtag.html")(dict_phone)
 """
 def dict_name(dict_id, dict_type):
     try:
-        dict = DMPDict.objects.get(dictId=dict_id, dictType=dict_type)
-        return dict.dictName
+        if str(dict_id).__contains__(","):
+            dict_list = DMPDict.objects.filter(dictId__in=str(dict_id).split(","), dictType=dict_type)
+            many_name = ''
+            for d in dict_list:
+                if len(many_name) == 0:
+                    many_name += d.dictName
+                else:
+                    many_name += "," + d.dictName
+            return many_name
+        else:
+            dict = DMPDict.objects.get(dictId=dict_id, dictType=dict_type)
+            return dict.dictName
     except:
         return ''
 
 register.filter('dict_name', dict_name)
+
+
+@register.simple_tag
+def current_index(forloopcounter, numPage, currentPage):
+    try:
+        return int(forloopcounter) + int(numPage)*(int(currentPage) - 1)
+    except:
+        return 0
 
 

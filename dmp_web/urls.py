@@ -35,5 +35,8 @@ urlpatterns = [
     url(r'^dmp/locations/update/$', dmp.locations_update),
 
     url(r'^dmp/ads/$', dmp.ads_main),
+
     url(r'^dmp/interest/$', dmp.interest_main),
+    url(r'^dmp/interest/edit/$', dmp.interest_edit),
+    url(r'^dmp/interest/update/$', dmp.interest_update),
 ]

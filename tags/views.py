@@ -3,12 +3,14 @@ from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, InvalidPage
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from tags.models import APPInfo, DMPDict, PhoneInfo, LocationInfo
+from tags.models import APPInfo, DMPDict, PhoneInfo, LocationInfo, ChannelInterest
 
 # Create your views here.
 one_page_num = 15
 
 """ APP查询 """
+
+
 def appsinfo_main(request):
     page = 1
     page_multi = 1
@@ -47,15 +49,19 @@ def appsinfo_main(request):
     has_next = True
     # 总页数大于需要显示的页数
     if one_page_num * page_multi <= paginator.num_pages:
-        page_curt_range = range((page_multi - 1)*one_page_num+1, page_multi*one_page_num+1)
+        page_curt_range = range((page_multi - 1) * one_page_num + 1, page_multi * one_page_num + 1)
     else:
-        page_curt_range = range((page_multi - 1)*one_page_num+1, paginator.num_pages+1)
+        page_curt_range = range((page_multi - 1) * one_page_num + 1, paginator.num_pages + 1)
         has_next = False
     return render(request, 'appsinfo.html', {'apps': apps_page, 'page_curt_range': page_curt_range,
                                              'search_value': searchAppType, 'search_appn': searchAppName,
-                                             'pageMulti': page_multi, 'one_page_num': one_page_num, 'has_next': has_next})
+                                             'pageMulti': page_multi, 'one_page_num': one_page_num,
+                                             'has_next': has_next})
+
 
 """ APP编辑 """
+
+
 def app_edit(request):
     try:
         page = request.GET.get("p", 1)
@@ -66,11 +72,19 @@ def app_edit(request):
             app_obj = APPInfo.objects.filter(appUsed=1).get(id=request.GET.get("id", None))
         interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
     except:
-        pass
+        app_obj = ''
+        page = 1
+        pagemulit = 1
+        search_value = ''
+        search_appn = ''
     return render(request, "appsedit.html", {'app': app_obj, 'interest_type_list': interest_type_list,
-                                             'page': page, 'pageMulti': pagemulit, 'search_value': search_value, 'search_appn':search_appn})
+                                             'page': page, 'pageMulti': pagemulit, 'search_value': search_value,
+                                             'search_appn': search_appn})
+
 
 """ APP更新 """
+
+
 def app_update(request):
     if request.method == 'POST':
         try:
@@ -95,10 +109,13 @@ def app_update(request):
     else:
         result = 'error'
     messages.success(request, result)
-    return HttpResponseRedirect("/dmp/appsinfo/?page="+str(page)+"&&pageMulti="+str(pageMulti)+"&&q="+str(search_value)+"&&appn="+unicode(search_appn))
+    return HttpResponseRedirect("/dmp/appsinfo/?page=" + str(page) + "&&pageMulti=" + str(pageMulti) + "&&q=" + str(
+        search_value) + "&&appn=" + unicode(search_appn))
 
 
 """ 手机标注 - 列表页 """
+
+
 def phoneinfo_main(request):
     try:
         page = int(request.GET.get('page', '1'))
@@ -127,9 +144,13 @@ def phoneinfo_main(request):
         has_next = False
 
     return render(request, 'phoneinfo.html', {'phones': telphone_page, 'page_curt_range': page_curt_range,
-                                             'pageMulti': page_multi, 'one_page_num': one_page_num, 'has_next': has_next})
+                                              'pageMulti': page_multi, 'one_page_num': one_page_num,
+                                              'has_next': has_next})
+
 
 """ 手机编辑 """
+
+
 def phone_edit(request):
     try:
         page = request.GET.get("p", 1)
@@ -137,11 +158,16 @@ def phone_edit(request):
         if request.GET.get("id", None):
             phone_obj = PhoneInfo.objects.filter(isUsed=1).get(id=request.GET.get("id", None))
     except:
+        phone_obj = ''
+        page = 1
+        pagemulit = 1
         pass
     return render(request, "phonedit.html", {'telObj': phone_obj, 'page': page, 'pageMulti': pagemulit})
 
 
 """ 手机编辑 - 保存 """
+
+
 def phone_update(request):
     if request.method == 'POST':
         try:
@@ -165,6 +191,8 @@ def phone_update(request):
 
 
 """ 人群构建 """
+
+
 def struct_people_main(request):
     app_type_list = DMPDict.objects.filter(isUsed=1, dictType='APP类别').order_by("dictId")
     interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
@@ -174,7 +202,8 @@ def struct_people_main(request):
     tree_xq_node_dict = {}
     for itl in interest_type_list:
         if len(itl.dictId) == 5:
-            tree_xq_dict[itl.dictId] = '{id: "%s", pId: 0, name: "%s", open: false, children:[temp_children]},' % (itl.dictId, itl.dictName)
+            tree_xq_dict[itl.dictId] = '{id: "%s", pId: 0, name: "%s", open: false, children:[temp_children]},' % (
+                itl.dictId, itl.dictName)
         elif len(itl.dictId) == 9:
             current_key = itl.dictId[0:5]
             if tree_xq_node_dict.has_key(current_key):
@@ -190,12 +219,14 @@ def struct_people_main(request):
             tree_xq_dict[k] = v.replace("temp_children", tree_xq_node_dict.get(k))
         else:
             tree_xq_dict[k] = v.replace("children:[temp_children]", "")
-    return render(request, "structpeople.html",{"app_type_list": app_type_list,
-                                                "interest_type_dict": tree_xq_dict,
-                                                "prov_city_list": prov_city_list})
+    return render(request, "structpeople.html", {"app_type_list": app_type_list,
+                                                 "interest_type_dict": tree_xq_dict,
+                                                 "prov_city_list": prov_city_list})
 
 
 """ 标签管理 - 位置信息 """
+
+
 def locations_main(request):
     locations_dict = DMPDict.objects.filter(dictType='常去地点')
     locations_list = LocationInfo.objects.all()
@@ -235,14 +266,14 @@ def locations_main(request):
 """
     标签管理 - 位置信息 [编辑]
 """
+
+
 def locations_edit(request):
     location_obj = ''
     try:
         if request.method == 'GET':
             locationId = request.GET.get('id', None)
-            print locationId
             location_obj = LocationInfo.objects.get(id=locationId)
-            print '====', location_obj.location
     except Exception, ex:
         print ex
     interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
@@ -252,6 +283,8 @@ def locations_edit(request):
 """
     标签管理 - 位置信息 [编辑-保存]
 """
+
+
 def locations_update(request):
     try:
         if request.method == 'POST':
@@ -269,11 +302,97 @@ def locations_update(request):
     messages.success(request, result)
     return HttpResponseRedirect("/dmp/locations/")
 
+
 """ 标签管理 - 广告信息 """
+
+
 def ads_main(request):
     return render(request, "adsinfo.html")
 
 
 """ 标签管理 - 兴趣映射 """
+
+
 def interest_main(request):
-    return render(request, "interestinfo.html")
+    page = 1
+    page_multi = 1
+    search = ''
+    try:
+        if request.method == 'GET':
+            page = int(request.GET.get('page', '1'))
+            page_multi = int(request.GET.get('pageMulti', '1'))
+            search = request.GET.get('q', '')
+            if page < 1:
+                page = 1
+        if request.method == 'POST':
+            search = str(request.POST['q'])
+    except:
+        page = 1
+        page_multi = 1
+        search = ''
+
+    channel_list = ChannelInterest.objects.filter(isUsed=1).order_by("chnId", "chnName")
+    if len(search) > 0:
+        channel_list = channel_list.filter(cId__in=search.split(","))
+
+    paginator = Paginator(channel_list, 15)
+    try:
+        channel_page = paginator.page(page)
+    except PageNotAnInteger:
+        channel_page = paginator.page(1)
+    except (EmptyPage, InvalidPage):
+        channel_page = paginator.page(paginator.num_pages)
+
+    has_next = True
+    # 总页数大于需要显示的页数
+    if one_page_num * page_multi <= paginator.num_pages:
+        page_curt_range = range((page_multi - 1) * one_page_num + 1, page_multi * one_page_num + 1)
+    else:
+        page_curt_range = range((page_multi - 1) * one_page_num + 1, paginator.num_pages + 1)
+        has_next = False
+    return render(request, 'interestinfo.html', {'channel': channel_page, 'page_curt_range': page_curt_range,
+                                                 'search_value': search, 'pageMulti': page_multi,
+                                                 'one_page_num': one_page_num, 'has_next': has_next})
+
+
+""" 标签管理 - 兴趣映射 - 编辑 """
+def interest_edit(request):
+    try:
+        if request.method == 'GET':
+            page = request.GET.get("p", 1)
+            pagemulit = request.GET.get("pm", 1)
+            search_value = request.GET.get('q', 1)
+            channel_obj = ChannelInterest.objects.filter(isUsed=1).get(id=request.GET.get("id", None))
+        else:
+            pass
+    except Exception, ex:
+        page = 1
+        pagemulit = 1
+        search_value = ''
+        print ex
+    interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
+    return render(request, "interestedit.html", {'interest_type_list': interest_type_list, 'page': page,
+                                                 'pageMulti': pagemulit, 'search_value': search_value,
+                                                 'chn_obj': channel_obj})
+""" 标签管理 - 兴趣映射 - 提交 """
+def interest_update(request):
+    try:
+        if request.method == 'POST':
+            search_value = request.POST['q']
+            page = int(request.POST['page'])
+            pageMulti = int(request.POST['pageMulti'])
+
+            chn_obj = ChannelInterest.objects.get(id=request.POST['id'])
+            chn_obj.chnStage = request.POST['chnStage']
+            chn_obj.chnInterest = request.POST['chnInterest']
+            chn_obj.save()
+            result = "success"
+    except Exception, ex:
+        result = "error"
+        page = 1
+        pageMulti = 1
+        search_value =''
+        print ex
+    messages.success(request, result)
+    return HttpResponseRedirect("/dmp/interest/?page=" + str(page) + "&&pageMulti=" + str(pageMulti) + "&&q=" + str(
+        search_value))

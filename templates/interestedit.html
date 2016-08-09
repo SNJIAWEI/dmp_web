@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block privateJsAndCss %}
+    <link rel="stylesheet" href="{% static "selectpicker/css/bootstrap-select.css" %}">
+    <script src="{% static "selectpicker/js/bootstrap-select.min.js" %}"></script>
+    <script src="{% static "selectpicker/js/i18n/defaults-zh_CN.min.js" %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#chnformsubmit").submit(function (e) {
+                var search_select_value = '';
+                $("#chnInterest1 option:selected").each(function () {
+                    search_select_value += $(this).val() + ",";
+                });
+                if (search_select_value) {
+                    $("#chnInterest2").attr("value", search_select_value);
+                } else {
+                    $("#chnInterest2").attr("value", "");
+                }
+                return true;
+            });
+            var selected_value = '{{ chn_obj.chnInterest }}';
+            if (selected_value.length > 0) {
+                $.each(selected_value.split(","), function (i, val) {
+                    if (val) $("#chnInterest1 option[value=" + val + "]").attr("selected", true);
+                });
+            }
+        });
+    </script>
+{% endblock %}
+{% block contentPage %}
+    <br><br><br>
+    {% load dictLibs %}
+    <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">
+            编辑兴趣映射
+        </h4>
+    </div>
+    <div class="modal-body">
+        <form id="chnformsubmit" class="form-horizontal" method="post" action="/dmp/interest/update/">{% csrf_token %}
+            <div class="form-group">
+                <label class="col-lg-2 control-label">渠道频道</label>
+                <div class="col-lg-10">
+                    <p class="form-control-static">
+                        <span class="label label-info"
+                              style="font-size: 13px;">渠道: {{ chn_obj.cId }}&nbsp;&nbsp;{{ chn_obj.cName }}</span><br><br>
+                        <span class="label label-warning"
+                              style="font-size: 13px;">频道: {{ chn_obj.chnId }}&nbsp;&nbsp;{{ chn_obj.chnName }}</span>
+                    </p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-lg-2 control-label">人生状态</label>
+                <div class="col-lg-10">
+                    <select id="locationStage_" class="form-control" name="chnStage">
+                        {% dicts_tag '人生阶段' chn_obj.chnStage %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="maxOption2" class="col-lg-2 control-label">兴趣分类</label>
+                <div class="col-lg-10">
+                    <select id="chnInterest1" name="chnInterest1" multiple class="selectpicker show-tick form-control"
+                            data-live-search="true">
+                        <option value="0">未知</option>
+                        {% for type in interest_type_list %}
+                            {% if type.dictId|length == 5 and forloop.first %}
+                                <optgroup label="{{ type.dictName }}">
+                                    {% elif type.dictId|length == 9 %}
+                                    <option value="{{ type.dictId }}" {% ifequal chn_obj.chnInterest type.dictId %}
+                                            selected{% endifequal %}>{{ type.dictName }}</option>
+                                    {% if forloop.last %}
+                                        </optgroup>
+                                    {% endif %}
+                            {% elif type.dictId|length == 5 %}
+                                </optgroup>
+                                <optgroup label="{{ type.dictName }}">
+                                    {% if forloop.last %}
+                                        </optgroup>
+                                    {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <br>
+            <div class="modal-footer ">
+                <input type="hidden" name="id" value="{{ chn_obj.id }}"/>
+                <input type="hidden" name="page" value="{{ page }}"/>
+                <input type="hidden" name="pageMulti" value="{{ pageMulti }}"/>
+                <input type="hidden" name="q" value="{{ search_value }}"/>
+                <input type="hidden" id="chnInterest2" name="chnInterest"/>
+                <button type="button" class="btn btn-default" onclick="javascript:history.back();">返&nbsp;&nbsp;回
+                </button>
+                &nbsp;&nbsp;
+                <button type="submit" class="btn btn-primary">提&nbsp;&nbsp;交</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

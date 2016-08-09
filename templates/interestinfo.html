@@ -1,127 +1,174 @@
 {% extends "base.html" %}
+{% load staticfiles %}
 {% block privateJsAndCss %}
-<script src="http://cdn.bootcss.com/messenger/1.5.0/js/messenger.min.js"></script>
-<link href="http://cdn.bootcss.com/messenger/1.5.0/css/messenger.css" rel="stylesheet">
-<link href="http://cdn.bootcss.com/messenger/1.5.0/css/messenger-theme-future.css" rel="stylesheet">
-<script>
-    $._messengerDefaults = {
-        extraClasses: 'messenger-fixed messenger-theme-future messenger-on-top messenger-on-right'
-    }
-</script>
-<style type="text/css">
-    body {
-        padding-top: 70px;
-    }
-    table {
-        table-layout: fixed;
-    }
-    table tr td {
-        font-size: 12px;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;/* IE */
-        -moz-text-overflow: ellipsis;/* Firefox,mozilla */
-    }
-</style>
+    <script src="http://cdn.bootcss.com/messenger/1.5.0/js/messenger.min.js"></script>
+    <link href="http://cdn.bootcss.com/messenger/1.5.0/css/messenger.css" rel="stylesheet">
+    <link href="http://cdn.bootcss.com/messenger/1.5.0/css/messenger-theme-future.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static "selectpicker/css/bootstrap-select.css" %}">
+    <script src="{% static "selectpicker/js/bootstrap-select.min.js" %}"></script>
+    <script src="{% static "selectpicker/js/i18n/defaults-zh_CN.min.js" %}"></script>
+
+    <script>
+        $._messengerDefaults = {
+            extraClasses: 'messenger-fixed messenger-theme-future messenger-on-top messenger-on-right'
+        }
+        $(document).ready(function () {
+            $("#search").submit(function (e) {
+                var search_select_value = '';
+                $("#cType option:selected").each(function () {
+                    search_select_value += $(this).val() + ",";
+                });
+                if (search_select_value) {
+                    $("#q").attr("value", search_select_value);
+                } else {
+                    $("#q").attr("value", "");
+                }
+                return true;
+            });
+            var selected_value = '{{ search_value }}';
+            if (selected_value.length > 0) {
+                $.each(selected_value.split(","), function (i, val) {
+                    if (val) $("#cType option[value=" + val + "]").attr("selected", true);
+                });
+            }
+        });
+    </script>
 {% endblock %}
 
 {% block currentNav %}
-<li><a href="#">总览</a></li>
-<li><a href="/dmp/structmans/">人群构建</a></li>
-<li><a href="#">人群分析</a></li>
-<li><a href="#">用户画像</a></li>
-<li class="dropdown">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 数据字典 <b class="caret"></b></a>
-    <ul class="dropdown-menu">
-        <li><a href="/dmp/phoneinfo/">手机标注</a></li>
-        <li><a href="/dmp/appsinfo/">APP标注</a></li>
-        <li><a href="/dmp/locations/">位置信息</a></li>
-{#        <li><a href="/dmp/ads/">广告信息</a></li>#}
-        <li class="active"><a href="/dmp/interest/">兴趣映射</a></li>
-    </ul>
-</li>
-<li><a href="#">工具</a></li>
-<li><a href="/admin" target="_blank">管理</a></li>
+    <li><a href="#">总览</a></li>
+    <li><a href="/dmp/structmans/">人群构建</a></li>
+    <li><a href="#">人群分析</a></li>
+    <li><a href="#">用户画像</a></li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 数据字典 <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li><a href="/dmp/phoneinfo/">手机标注</a></li>
+            <li><a href="/dmp/appsinfo/">APP标注</a></li>
+            <li><a href="/dmp/locations/">位置信息</a></li>
+            {#        <li><a href="/dmp/ads/">广告信息</a></li>#}
+            <li class="active"><a href="/dmp/interest/">兴趣映射</a></li>
+        </ul>
+    </li>
+    <li><a href="#">工具</a></li>
+    <li><a href="/admin" target="_blank">管理</a></li>
 {% endblock %}
 
 {% block contentPage %}
-{% for msg in messages %}
-    {% ifequal msg.message 'success' %}
-        <script>
-        $.globalMessenger().post({message: "Successfully !", type: "success", showCloseButton: false, hideAfter: 3, hideOnNavigate: true});
-        </script>
-    {% else %}
-        <script>
-        $.globalMessenger().post({message: "Update failed ! please try again !", type: "error", showCloseButton: false, hideAfter: 3, hideOnNavigate: true});
-        </script>
-    {% endifequal %}
-{% endfor %}
-
-{% load dictLibs %}
-
-<table class="table table-hover">
-    <thead>
-    <tr>
-        <th width="6%">序号</th>
-        <th>兴趣分类</th>
-        <th>优酷频道</th>
-        <th>爱奇艺平台</th>
-        <th>PPTV</th>
-        <th>搜狐</th>
-        <th width="8%">操作</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for app in apps %}
-
-    <tr><!-- success|error|warning|info -->
-        <td>{{ forloop.counter}}</td>
-        <td title="{{ app.appName }}">{{ app.appName }}</td>
-        <td>
-            {{ app.appStage|dict_name:'人生阶段' }}
-        </td>
-        <td>
-            {{ app.appBssIntr|dict_name:'兴趣分类' }}
-        </td>
-        <td>{{ app.appFlux|floatformat:0 }}</td>
-        <td>{{ app.appFluxPer|floatformat:5 }}%</td>
-        <td>
-            <a href="/dmp/locations/edit/?id={{ app.id }}&&p={{ apps.number }}&&pm={{ pageMulti }}" role="button" data-toggle="modal">编辑</a>
-        </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
-<nav>
-  <ul class="pagination">
-      {% if pageMulti > 1 %}
-          <li>
-            <a href="?page={% widthratio pageMulti|add:-1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'-1' }}" aria-label="Previous">
-            <span aria-hidden="true">上一页</span>
-            </a>
-          </li>
-      {% endif %}
-
-    {% for page in page_curt_range %}
-    {% if page %}
-    {% ifequal page apps.number %}
-        <li class="active"><a href="#">{{ page }}</a></li>
-    {% else %}
-        <li><a href="?page={{ page }}&&pageMulti={{ pageMulti }}">{{ page }}</a></li>
-    {% endifequal %}
-    {% endif %}
+    {% for msg in messages %}
+        {% ifequal msg.message 'success' %}
+            <script>
+                $.globalMessenger().post({
+                    message: "Successfully !",
+                    type: "success",
+                    showCloseButton: false,
+                    hideAfter: 3,
+                    hideOnNavigate: true
+                });
+            </script>
+        {% else %}
+            <script>
+                $.globalMessenger().post({
+                    message: "Update failed ! please try again !",
+                    type: "error",
+                    showCloseButton: false,
+                    hideAfter: 3,
+                    hideOnNavigate: true
+                });
+            </script>
+        {% endifequal %}
     {% endfor %}
 
-    {% if has_next %}
-        <li>
-            <a href="?page={% widthratio pageMulti|add:1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'1'}}" aria-label="Next">
-            <span aria-hidden="true">下一页</span>
-            </a>
-        </li>
-    {% endif %}
-    <li><label class="label label-primary" style="margin-left: 50px;font-size: 12px;">当前第 {{ apps.number }} 页, 总 {{ apps.paginator.num_pages }} 页。</label></li>
-  </ul>
-  <ul></ul>
-</nav>
+    {% load dictLibs %}
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#"></a>
+            </div>
+            <form id="search" class="navbar-form navbar-left" role="search" method="post"
+                  action="/dmp/interest/">{% csrf_token %}
+                <div class="form-group">
+                    <select id="cType" name="cType" class="selectpicker" multiple  data-actions-box="true">
+                        <optgroup label="RTB渠道">
+                            {% dicts_tag '渠道' app.appType %}
+                        </optgroup>
+                    </select>
+                </div>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <input type="hidden" id="q" name="q" value="{{ search_value }}">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </nav>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th width="8%">序号</th>
+            <th width="10%">渠道ID</th>
+            <th width="10%">渠道名称</th>
+            <th>频道ID</th>
+            <th width="18%">频道名称</th>
+            <th width="28%">兴趣分类</th>
+            <th>人生阶段</th>
+            <th width="8%">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in channel %}
+            <tr><!-- success|error|warning|info -->
+                <td>{% current_index forloop.counter one_page_num channel.number %}</td>
+                <td>{{ c.cId }}</td>
+                <td>{{ c.cName }}</td>
+                <td>{{ c.chnId }}</td>
+                <td title="{{ c.chnName }}">{{ c.chnName }}</td>
+                {% with c.chnInterest|dict_name:'兴趣分类' as  all_name %}
+                <td title="{{ all_name }}">{{ all_name }}</td>
+                {% endwith %}
+                <td>{{ c.chnStage|dict_name:'人生阶段' }}</td>
+                <td>
+                    <a href="/dmp/interest/edit/?id={{ c.id }}&&p={{ channel.number }}&&pm={{ pageMulti }}&&q={{ search_value }}"
+                       role="button" data-toggle="modal">编辑</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <nav>
+        <ul class="pagination">
+            {% if pageMulti > 1 %}
+                <li>
+                    <a href="?page={% widthratio pageMulti|add:-1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'-1' }}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">上一页</span>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for page in page_curt_range %}
+                {% if page %}
+                    {% ifequal page channel.number %}
+                        <li class="active"><a href="#">{{ page }}</a></li>
+                    {% else %}
+                        <li><a href="?page={{ page }}&&pageMulti={{ pageMulti }}&&q={{ search_value }}">{{ page }}</a></li>
+                    {% endifequal %}
+                {% endif %}
+            {% endfor %}
+
+            {% if has_next %}
+                <li>
+                    <a href="?page={% widthratio pageMulti|add:1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'1' }}&&q={{ search_value }}"
+                       aria-label="Next">
+                        <span aria-hidden="true">下一页</span>
+                    </a>
+                </li>
+                <li><label class="label label-primary"
+                           style="margin-left: 50px;font-size: 12px;">当前第 {{ channel.number }} 页,
+                    总 {{ channel.paginator.num_pages }} 页。</label></li>
+            {% endif %}
+
+        </ul>
+        <ul></ul>
+    </nav>
 
 {% endblock %}

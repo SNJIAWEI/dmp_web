@@ -33,23 +33,6 @@
             }
         });
     </script>
-    <style type="text/css">
-        body {
-            padding-top: 70px;
-        }
-
-        table {
-            table-layout: fixed;
-        }
-
-        table tr td {
-            font-size: 12px;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis; /* IE */
-            -moz-text-overflow: ellipsis; /* Firefox,mozilla */
-        }
-    </style>
 {% endblock %}
 
 {% block currentNav %}
@@ -115,7 +98,7 @@
                 </div>
                 &nbsp;&nbsp;&nbsp;&nbsp;
                 <input type="hidden" id="q" name="q" value="{{ search_value }}">
-                <button type="submit" class="btn btn-warning">Search</button>
+                <button type="submit" class="btn btn-primary">Search</button>
             </form>
         </div>
     </nav>
@@ -126,12 +109,12 @@
             <th width="6%">序号</th>
             <th width="15%">APP标识</th>
             <th width="20%">APP描述</th>
-            <th>类别</th>
+            <th width="6%">类别</th>
             <th>兴趣分类</th>
             <th width="5%">性别</th>
-            <th>人生状态</th>
-            <th>流量</th>
-            <th>流量占比</th>
+            <th width="7%">人生状态</th>
+            <th width="10%">流量</th>
+            <th width="10%">流量占比</th>
             <th width="8%">操作</th>
         </tr>
         </thead>
@@ -144,9 +127,11 @@
                 <td>
                     {{ app.appType|dict_name:'APP类别' }}
                 </td>
-                <td>
-                    {{ app.appBssIntr|dict_name:'兴趣分类' }}
+                {% with app.appBssIntr|dict_name:'兴趣分类' as  all_name%}
+                 <td title="{{ all_name }}">
+                    {{ all_name }}
                 </td>
+                {% endwith %}
                 <td>
                     {{ app.appSex|dict_name:'性别' }}
                 </td>
