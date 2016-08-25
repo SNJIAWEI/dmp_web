@@ -196,6 +196,7 @@ def phone_update(request):
 def struct_people_main(request):
     app_type_list = DMPDict.objects.filter(isUsed=1, dictType='APP类别').order_by("dictId")
     interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
+    often_place_list = DMPDict.objects.filter(isUsed=1, dictType='常去地点').order_by("dictId")
     prov_city_list = DMPDict.objects.filter(isUsed=1, dictType='省市').order_by("dictId")
 
     tree_xq_dict = {}
@@ -219,8 +220,10 @@ def struct_people_main(request):
             tree_xq_dict[k] = v.replace("temp_children", tree_xq_node_dict.get(k))
         else:
             tree_xq_dict[k] = v.replace("children:[temp_children]", "")
+
     return render(request, "structpeople.html", {"app_type_list": app_type_list,
                                                  "interest_type_dict": tree_xq_dict,
+                                                 "often_place_list": often_place_list,
                                                  "prov_city_list": prov_city_list})
 
 
@@ -281,7 +284,7 @@ def locations_edit(request):
         print ex
     interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
     return render(request, "locatedit.html", {'interest_type_list': interest_type_list,
-                                              'location_obj': location_obj, 'anchor':anchor})
+                                              'location_obj': location_obj, 'anchor': anchor})
 
 
 """
@@ -304,7 +307,7 @@ def locations_update(request):
         print ex
         result = "error"
     messages.success(request, result)
-    return HttpResponseRedirect("/dmp/locations/#"+request.POST['m'])
+    return HttpResponseRedirect("/dmp/locations/#" + request.POST['m'])
 
 
 """ 标签管理 - 广告信息 """
@@ -360,6 +363,8 @@ def interest_main(request):
 
 
 """ 标签管理 - 兴趣映射 - 编辑 """
+
+
 def interest_edit(request):
     try:
         if request.method == 'GET':
@@ -378,7 +383,11 @@ def interest_edit(request):
     return render(request, "interestedit.html", {'interest_type_list': interest_type_list, 'page': page,
                                                  'pageMulti': pagemulit, 'search_value': search_value,
                                                  'chn_obj': channel_obj})
+
+
 """ 标签管理 - 兴趣映射 - 提交 """
+
+
 def interest_update(request):
     try:
         if request.method == 'POST':
@@ -395,7 +404,7 @@ def interest_update(request):
         result = "error"
         page = 1
         pageMulti = 1
-        search_value =''
+        search_value = ''
         print ex
     messages.success(request, result)
     return HttpResponseRedirect("/dmp/interest/?page=" + str(page) + "&&pageMulti=" + str(pageMulti) + "&&q=" + str(

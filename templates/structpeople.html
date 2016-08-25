@@ -22,27 +22,30 @@
     <div class="row clearfix">
         <div class="col-md-9 column">
 
-            <div class="panel panel-default">
+            <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h5 class="modal-title">基本信息</h5>
                 </div>
                 <div class="panel-body">
-                    <form class="form-horizontal">
+                    <form class="form-horizontal" id="baseinfo_form">
                         <div class="form-group">
                             <label class="col-sm-2 control-label" style="text-align: left;">性别</label>
+                            <label class="radio-inline">
+                                <input type="radio" name="sex" id="sex_0" value="0" checked onclick="baseinfo_click();">不限&nbsp;&nbsp;
+                            </label>
                             {% dict_phone '性别' 'sex' 'radio'%}
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label" style="text-align: left;">人生阶段</label>
                             <div class="radio">
                                 <label>
-                                    <input type="radio" name="stage" id="stage_0" value="0" checked onclick="disabledOnoff('info_stage', 0)"> 不限
+                                    <input type="radio" name="stage" id="stage_0" value="0" checked onclick="disabledOnoff('info_stage', 0);baseinfo_click();"> 不限
                                 </label>
                             </div>
                             <div class="radio">
                                 <label class="col-sm-2 control-label"></label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="stage" id="stage_1" value="1" onclick="disabledOnoff('info_stage', 1)">自定义&nbsp;&nbsp;
+                                    <input type="radio" name="stage" id="stage_1" value="1" onclick="disabledOnoff('info_stage', 1);">自定义&nbsp;&nbsp;
                                 </label>
                                 {% dict_phone '人生阶段' 'info_stage' 'checkbox'%}
                             </div>
@@ -52,34 +55,33 @@
                             <label class="col-sm-2 control-label" style="text-align: left;">活跃度</label>
                             <div class="radio">
                                 <label>
-                                    <input type="radio" name="inlineRadioOptions2" id="inlineRadio1" value="option1"
-                                           checked> 不限
+                                    <input type="radio" name="hyd" id="inlineRadio1" value="0" checked onclick="baseinfo_click();"> 不限
                                 </label>
                             </div>
                             <div class="radio">
                                 <label class="col-sm-2 control-label"></label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="inlineRadioOptions2" id="inlineRadio1" value="option1">自定义&nbsp;&nbsp;
+                                    <input type="radio" name="hyd" id="inlineRadio1" value="1" onclick="baseinfo_click();">自定义&nbsp;&nbsp;
                                 </label>
-                                <label class="radio-inline">
-                                    <input id="hyd" class="range-slider" type="hidden" value="0,0" disabled>
+                                <label class="radio-inline" id="hydcontent">
+                                    <input id='hyd' class='range-slider' type='hidden' value='0,0'>
                                 </label>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
-            <div class="panel panel-default">
+            <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h5 class="modal-title">移动设备</h5>
                 </div>
                 <div class="panel-body">
-                    <form class="form-horizontal">
+                    <form class="form-horizontal" id="mobileinfo_form">
                         <div class="form-group">
                             <label class="col-sm-2 control-label" style="text-align: left;">手机品牌</label>
                             <div class="radio">
                                 <label>
-                                    <input type="radio" name="telBrand" id="telBrand_0" value="0" checked onclick="disabledOnoff('ph_brand', 0)"> 不限
+                                    <input type="radio" name="telBrand" id="telBrand_0" value="0" checked onclick="disabledOnoff('ph_brand', 0);baseinfo_click();"> 不限
                                 </label>
                             </div>
                             <div class="radio">
@@ -95,7 +97,7 @@
                             <label class="col-sm-2 control-label" style="text-align: left;">手机价格</label>
                             <div class="radio">
                                 <label>
-                                    <input type="radio" name="tel_price" id="tel_price_0" value="0" checked onclick="disabledOnoff('ph_price', 0)"> 不限
+                                    <input type="radio" name="tel_price" id="tel_price_0" value="0" checked onclick="disabledOnoff('ph_price', 0);baseinfo_click();"> 不限
                                 </label>
                             </div>
                             <div class="radio">
@@ -111,7 +113,7 @@
                             <label class="col-sm-2 control-label" style="text-align: left;">操作系统</label>
                             <div class="radio">
                                 <label>
-                                    <input type="radio" name="sys" id="sys_0" value="0" checked onclick="disabledOnoff('ph_os', 0)"> 不限
+                                    <input type="radio" name="sys" id="sys_0" value="0" checked onclick="disabledOnoff('ph_os', 0);baseinfo_click();"> 不限
                                 </label>
                             </div>
                             <div class="radio">
@@ -128,7 +130,7 @@
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="net" id="net_0" value="0"
-                                           checked onclick="disabledOnoff('ph_net', 0)"> 不限
+                                           checked onclick="disabledOnoff('ph_net', 0);baseinfo_click()"> 不限
                                 </label>
                             </div>
                             <div class="radio">
@@ -145,7 +147,7 @@
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="bs" id="bs_0" value="0"
-                                           checked onclick="disabledOnoff('ph_operator', 0)"> 不限
+                                           checked onclick="disabledOnoff('ph_operator', 0);baseinfo_click();"> 不限
                                 </label>
                             </div>
                             <div class="radio">
@@ -156,7 +158,6 @@
                                 {% dict_phone '手机运营商' 'ph_operator' 'checkbox'%}
                             </div>
                         </div>
-
                     </form>
                 </div>
             </div>
@@ -165,9 +166,9 @@
                     <h5 class="modal-title">兴趣偏好&nbsp;&nbsp;&nbsp;&nbsp;<label class="label label-warning">注: 树形结构, 请双击节点添加到右侧!</label></h5>
                 </div>
                 <div class="panel-body">
-                    <form class="form-horizontal">
+                    <form class="form-horizontal" id="interest_form">
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"style="text-align: left;margin-top: 10px;"><abbr title="">兴趣分类</abbr></label>
+                            <label class="col-sm-2 control-label"style="text-align: left;margin-top: 10px;">兴趣分类</label>
                             <div class="radio">
                                 <label class="radio-inline">
                                     <div class="zTreeBackground left">
@@ -180,7 +181,7 @@
                                     <br>
                                 </label>
                                 <label class="checkbox-inline">
-                                    <select id="tree_xq_r" name="tree_xq_r" multiple class="form-control" style="width: 200px; height: 220px;">
+                                    <select id="tree_xq_r" name="tree_xq_r" multiple class="form-control" style="width: 220px; height: 240px;">
                                     </select>
                                 </label>
                             </div>
@@ -191,14 +192,13 @@
                                    style="text-align: left; margin-top: 10px;">视频关键字</label>
                             <div class="radio">
                                 <label class="col-sm-8 radio-inline">
-                                    <input type="text" class="form-control" placeholder="Keywords">&nbsp;&nbsp;
+                                    <input type="text" id="video_kw" name="video_kw" class="form-control" placeholder="Keywords">&nbsp;&nbsp;
                                 </label>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"
-                                   style="text-align: left;margin-top: 10px;">常去地点</label>
+                            <label class="col-sm-2 control-label" style="text-align: left;margin-top: 10px;">常去地点</label>
                             <div class="radio">
                                 <label class="radio-inline">
                                     <div class="zTreeBackground left">
@@ -207,21 +207,15 @@
                                 </label>
                                 <label>
                                     <br><br>
-                                    <button type="button" class="btn btn-danger btn-sm">&nbsp;删除&nbsp;</button>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeSelectOptions('tree_cqdd_r')">&nbsp;删除&nbsp;</button>
                                     <br>
                                 </label>
                                 <label class="checkbox-inline">
-                                    <select multiple class="form-control" style="width: 200px; height: 220px;">
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                        <option>5</option>
-                                    </select>
+                                    <select id="tree_cqdd_r" name="tree_cqdd_r" multiple class="form-control" style="width: 220px; height: 240px;"></select>
                                 </label>
                             </div>
                         </div>
-
+                        <!--  目前尚无此标签
                         <div class="form-group">
                             <label class="col-sm-2 control-label"
                                    style="text-align: left;margin-top: 10px;">广告分类</label>
@@ -236,13 +230,7 @@
                                     <button type="button" class="btn btn-danger btn-sm">&nbsp;删除&nbsp;</button>
                                 </label>
                                 <label class="checkbox-inline">
-                                    <select multiple class="form-control" style="width: 200px; height: 220px;">
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                        <option>5</option>
-                                    </select>
+                                    <select id="tree_adfl_r" name="tree_adfl_r" multiple class="form-control" style="width: 220px; height: 240px;"></select>
                                 </label>
                             </div>
                         </div>
@@ -251,26 +239,26 @@
                             <label class="col-sm-2 control-label" style="text-align: left;">权重</label>
                             <div class="radio">
                                 <label>
-                                    <input type="radio" name="inlineRadioOptionsxx" id="inlineRadio1" value="option1"
-                                           checked> 不限
+                                    <input type="radio" name="interestQuanzhong" id="inlineRadio1" value="0" checked onclick="disabledOnoff('intrQzhong', 0)"> 不限
                                 </label>
                             </div>
                             <div class="radio">
                                 <label class="col-sm-2 control-label"></label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="inlineRadioOptionsxx" id="inlineRadio1" value="option1">自定义&nbsp;&nbsp;
+                                    <input type="radio" name="interestQuanzhong" id="inlineRadio1" value="1" onclick="disabledOnoff('intrQzhong', 1)">自定义&nbsp;&nbsp;
                                 </label>
                                 <label class="checkbox-inline">
-                                    <input type="checkbox" name="inlineRadioOptions" id="inlineRadio2" value="option2">普通&nbsp;
+                                    <input type="checkbox" name="intrQzhong" id="intrQzhong1" value="1" disabled>普通&nbsp;
                                 </label>
                                 <label class="checkbox-inline">
-                                    <input type="checkbox" name="inlineRadioOptions" id="inlineRadio3" value="option3">中&nbsp;&nbsp;
+                                    <input type="checkbox" name="intrQzhong" id="intrQzhong2" value="2" disabled>中&nbsp;&nbsp;
                                 </label>
                                 <label class="checkbox-inline">
-                                    <input type="checkbox" name="inlineRadioOptions" id="inlineRadio3" value="option3">高&nbsp;&nbsp;
+                                    <input type="checkbox" name="intrQzhong" id="intrQzhong3" value="3" disabled>高&nbsp;&nbsp;
                                 </label>
                             </div>
                         </div>
+                        -->
                     </form>
                 </div>
             </div>
@@ -279,10 +267,9 @@
                     <h5 class="modal-title">来源&nbsp;&nbsp;&nbsp;&nbsp;<label class="label label-warning">注: 请双击子节点添加到右侧!</label></h5>
                 </div>
                 <div class="panel-body">
-                    <form class="form-horizontal">
+                    <form class="form-horizontal" id="source_form">
                         <div class="form-group">
-                            <label class="col-sm-2 control-label"
-                                   style="text-align: left;margin-top: 10px;">应用分类</label>
+                            <label class="col-sm-2 control-label" style="text-align: left;margin-top: 10px;">应用分类</label>
                             <div class="radio">
                                 <label class="radio-inline">
                                     <div class="zTreeBackground left">
@@ -294,7 +281,7 @@
                                     <button type="button" class="btn btn-danger btn-sm" onclick="removeSelectOptions('tree_appfl_r')">&nbsp;删除&nbsp;</button>
                                 </label>
                                 <label class="checkbox-inline">
-                                    <select id="tree_appfl_r" name="tree_appfl_r" multiple class="form-control" style="width: 200px; height: 220px;">
+                                    <select id="tree_appfl_r" name="tree_appfl_r" multiple class="form-control" style="width: 220px; height: 240px;">
                                     </select>
                                 </label>
                             </div>
@@ -305,39 +292,33 @@
                             <div class="radio">
                                 <label>
                                     <input type="radio" name="way" id="way_0" value="0"
-                                           checked onclick="disabledOnoff('chnel', 0)"> 不限
+                                           checked onclick="disabledOnoff('chnel', 0);baseinfo_click();"> 不限
                                 </label>
                             </div>
                             <div class="radio">
                                 <label class="col-sm-2 control-label"></label>
                                 <label class="radio-inline">
-                                    <input type="radio" name="way" id="way_1" value="1" onclick="disabledOnoff('chnel', 1)">自定义&nbsp;&nbsp;
+                                    <input type="radio" name="way" id="way_1" value="1" onclick="disabledOnoff('chnel', 1);">自定义&nbsp;&nbsp;
                                 </label>
                                 {% dict_phone '渠道' 'chnel' 'checkbox'%}
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label class="col-sm-2 control-label" style="text-align: left;">区域</label>
+                            <label class="col-sm-2 control-label" style="text-align: left;margin-top: 10px;">区域</label>
                             <div class="radio">
-                                <label>
-                                    <input type="radio" name="area" id="area_0" value="0"
-                                           checked onclick="disabledOnoff('prov', 0)"> 不限
+                                <label class="radio-inline">
+                                    <div class="zTreeBackground left">
+                                        <ul id="tree_city" class="ztree"></ul>
+                                    </div>
                                 </label>
-                            </div>
-                            <div class="radio">
-                                <label class="col-sm-2 control-label"></label>
-                                <label class="radio-inline" style="height: 245px;">
-                                    <input type="radio" name="area" id="area_1" value="1" onclick="disabledOnoff('prov', 1)">省市&nbsp;&nbsp;
+                                <label>
+                                    <br><br>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeSelectOptions('tree_city_r')">&nbsp;删除&nbsp;</button>
+                                    <br>
                                 </label>
                                 <label class="checkbox-inline">
-                                    <select multiple class="form-control" name="prov" style="width: 200px; height: 220px;" disabled>
-                                        <option>北京</option>
-                                        <option>上海</option>
-                                        <option>河北</option>
-                                        <option>河南</option>
-                                        <option>天津</option>
-                                    </select>&nbsp;
+                                    <select id="tree_city_r" name="tree_city_r" multiple class="form-control" style="width: 220px; height: 240px;"></select>
                                 </label>
                             </div>
                         </div>
@@ -345,11 +326,18 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3 column"></div>
+        <div class="col-md-3 column">
+        </div>
     </div>
 {% endblock %}
 {% block floatRightDiv %}
-    <div id="sidebar" style="width: 400px;background-color: #3f4345; height: 200px; position: absolute; top: 60px; right: 20px;"></div>
+    <div id="sidebar" style="width: 420px; position: absolute; top: 40px; right: 10px;">
+    <div class="bs-callout bs-callout-info" id="base_info">
+        <p>总人数&nbsp;&nbsp;&nbsp;<label id="total_count" class='label label-warning' style='font-size: 16px;'>0</label>&nbsp;&nbsp;&nbsp;人</p>
+        <p>总低价&nbsp;&nbsp;&nbsp;<label id="total_price" class='label label-info' style='font-size: 16px;'>0</label>&nbsp;&nbsp;&nbsp;元</p>
+        <p>流量&nbsp;&nbsp;&nbsp;<label id="ll_count" class='label label-danger' style='font-size: 16px;'>0</label>&nbsp;&nbsp;&nbsp;次</p>
+    </div>
+    </div>
 {% endblock %}
 
 
@@ -367,7 +355,10 @@
     <link rel="stylesheet" href="{% static "jRange/jquery.range.css" %}">
     <script src="{% static "jRange/jquery.range-min.js" %}"></script>
     <link rel="stylesheet" href="{% static "zTree/zTreeStyle.css" %}">
+    <link rel="stylesheet" href="{% static "css/docs.min.css" %}">
     <script src="{% static "zTree/jquery.ztree.core.min.js" %}"></script>
+    <script src="{% static "elasticsearch-js/elasticsearch.jquery.js" %}"></script>
+    <script src="{% static "animateNumber/jquery.animateNumber.min.js" %}"></script>
     <style type="text/css">
         body {
             padding-top: 0px;
@@ -389,18 +380,18 @@
         }
 
         div.zTreeBackground {
-            width: 200px;
-            height: 222px;
+            width: 220px;
+            height: 242px;
             text-align: left;
         }
 
         ul.ztree {
-            margin-top: 2px;
+            margin-top: 1px;
             border: 1px solid #cccccc;
             border-radius: 4px;
             background: #FFFFFF;
-            width: 200px;
-            height: 220px;
+            width: 220px;
+            height: 240px;
             overflow-y: scroll;
             overflow-x: auto;
         }
@@ -411,7 +402,7 @@
     <script type="text/javascript">
         var setting = {
             view: {
-                showIcon: false, showLine: true, dblClickExpand: false
+                showIcon: true, showLine: true, dblClickExpand: false
             },
             callback: {
                 onClick: function (e, treeId, treeNode) {
@@ -433,6 +424,7 @@
                         });
                         if (!has_option){
                             $("#"+treeId+"_r").append("<option value='"+treeNode.id+"'>"+treeNode.name+"</option>");
+                            baseinfo_click();
                         }else{
                             $.globalMessenger().post({message: "该节点已添加,请勿重复添加!", type: "error", showCloseButton: false, hideAfter: 3, hideOnNavigate: true});
                         }
@@ -441,18 +433,24 @@
             }
         };
         var zNodes_xq = [{% for v in interest_type_dict.values %}{{ v|safe }}{% endfor %}];
-        var zNodes_cqdd = [
-                {id: 0, name: "酒店", open: false,children: [
-                    {id: 21, name: "x"},]},
-                {id: 0, name: "餐厅", open: false,children: [
-                    {id: 21, name: "x"},]},
-                {id: 0, name: "教育培训", open: false,children: [
-                    {id: 21, name: "x"},]},
-                {id: 0, name: "住宅小区", open: false,children: [
-                    {id: 21, name: "x"},]},
-                {id: 0, name: "旅游景区", open: false,children: [
-                    {id: 21, name: "x"},]},
-        ];
+        var cqdd_json = "[";
+        {% for op in often_place_list %}
+                {% if op.dictId|length == 5 and forloop.first %}
+                    cqdd_json += '{id: "{{ op.dictId }}", name: "{{ op.dictName }}", open: false, children: [';
+                {% elif op.dictId|length == 9 %}
+                    cqdd_json += '{id: "{{ op.dictId }}", name: "{{ op.dictName }}"},';
+                    {% if forloop.last %}
+                        cqdd_json += ']},';
+                    {% endif %}
+                {% elif op.dictId|length == 5 %}
+                    cqdd_json += ']}, {id: "{{ op.dictId }}", name: "{{ op.dictName }}", open: false, children: [';
+                    {% if forloop.last %}
+                        cqdd_json += ']},';
+                    {% endif %}
+                {% endif %}
+        {% endfor %}
+        cqdd_json+="]";
+        var zNodes_cqdd = eval('('+cqdd_json+')');
         var zNodes_adfl = [
                 {id: 0, name: "房产", open: false,children: [
                     {id: 21, name: "x"},]},
@@ -466,32 +464,100 @@
                 {id: "{{ app_type_dict.dictId }}", name: "{{ app_type_dict.dictName }}", open: false,},
             {% endfor %}
         ];
+        var cities_json = "[";
+        {% for op in prov_city_list %}
+                {% if op.dictId|length == 3 and forloop.first %}
+                    cities_json += '{id: "{{ op.dictId }}", name: "{{ op.dictName }}", open: false, children: [';
+                {% elif op.dictId|length == 5 %}
+                    cities_json += '{id: "{{ op.dictId }}", name: "{{ op.dictName }}"},';
+                    {% if forloop.last %}
+                        cities_json += ']},';
+                    {% endif %}
+                {% elif op.dictId|length == 3 %}
+                    cities_json += ']}, {id: "{{ op.dictId }}", name: "{{ op.dictName }}", open: false, children: [';
+                    {% if forloop.last %}
+                        cities_json += ']},';
+                    {% endif %}
+                {% endif %}
+        {% endfor %}
+        cities_json +="]";
+        var zNodes_city = eval('('+cities_json+')');
         $(document).ready(function () {
+            // 初始化活跃度滑动控件
             $(".range-slider").jRange({
                 from: 0,
-                to: 1000,
+                to: 100,
                 step: 1,
-                scale: [0, 1000],
+                scale: [0, 50,100],
                 format: '%s',
                 width: 400,
                 showLabels: true,
                 isRange: true,
                 theme: 'theme-blue',
                 ondragend: function () {
-                    alert($("#hyd").val());
+                    baseinfo_click();
                 }
             });
+            $(".range-slider").jRange('disable');
 
+            // 初始化页面中的树形结构
             $.fn.zTree.init($("#tree_xq"), setting, zNodes_xq);
             $.fn.zTree.init($("#tree_cqdd"), setting, zNodes_cqdd);
             $.fn.zTree.init($("#tree_adfl"), setting, zNodes_adfl);
             $.fn.zTree.init($("#tree_appfl"), setting, zNodes_appfl);
-
+            $.fn.zTree.init($("#tree_city"), setting, zNodes_city);
+            // 右侧浮动层
             $(window).scroll(function () {
-                var offsetTop = $(window).scrollTop() + 60 +"px";
-                $("#sidebar").animate({top: offsetTop},{duration: 160, queue: false});
+                var offsetTop = $(window).scrollTop() + 40 +"px";
+                $("#sidebar").animate({top: offsetTop},{duration: 140, queue: false});
             });
         });
+        // Elasticsearch jquery client
+        var esclient = new $.es.Client({
+            hosts: 'http://58.61.152.2:9201',
+            log: 'trace'
+        });
+        esclient.ping({
+            requestTimeout: 30000,
+            hello: "elasticsearch"
+        }, function (error) {
+            if (error) {
+                console.error("elasticsearch cluster is down! ERROR: "+error);
+            } else {
+                console.log('All is well');
+            }
+        });
+        // Elasticsearch search 操作
+        function search_es(query_json) {
+            esclient.search({
+                index: 'tag',
+                type: 'taglib',
+                body: {
+                    query: query_json
+                }
+            }).then(function (response) {
+                console.log("search_es");
+                console.log(response);
+            }, function (err) {
+                console.trace(err.message);
+            });
+        }
+        var tmp = '{"bool":{"must":[{"exists":{"field": "tags.UU05"}}, {"exists":{"field": "tags.N00030001"}}]}}';
+        // Elasticsearch count 操作
+        function count_es(query_json) {
+            esclient.count({
+                index: 'tag',
+                type: 'taglib',
+                body: {
+                    query: eval('(' + query_json + ')')
+                }
+            }).then(function (response) {
+                alert(response.count);
+            }, function (err) {
+                console.trace(err.message);
+            });
+        }
+        // 组间禁用事件
         function disabledOnoff(ename, onoff) {
             var objs = $("[name='" + ename + "']");
             if (onoff) {
@@ -505,8 +571,215 @@
                 });
             }
         }
+        // 通用右侧删除事件
         function removeSelectOptions(selectId) {
             $("#"+selectId+" option:selected").remove();
+            baseinfo_click();
+        }
+        function ajax_search_es_baseinfo() {
+            var sql="SELECT count(*) AS ky FROM tag where tags.UU05>0";// 总人数
+            base_ajax(sql, function (err) {
+                alert(err);
+            }, function (data) {
+                number_animate("total_count", data.aggregations.ky.value);
+            });
+            number_animate("total_price", 0);// 总底价
+            var fluxSql="SELECT SUM(tags.UU05) as ky FROM tag where tags.UU05>0";// 流量
+            base_ajax(fluxSql, function (err) {
+                alert(err);
+            }, function (data) {
+                number_animate("ll_count", data.aggregations.ky.value);
+            });
+        }
+        // 第一次加载页面所有项默认为无限制 - 加载浮动层数据
+        ajax_search_es_baseinfo();
+        // 页面上出现点击事件是触发, 同时获取当前页面各个表单选中的控件并组合条件
+        function baseinfo_click() {
+            var scdt='', stgcdt='', stgFlag=false;
+            // 基本信息表单
+            $("#baseinfo_form input:checked").each(function () {
+                var currtAttrName=$(this).attr("name"), currtAttrVal=$(this).val();
+                if(currtAttrName=="sex"&&currtAttrVal!="0"){
+                    scdt="tags."+currtAttrVal+">0";
+                } else if(currtAttrName=="sex"&&currtAttrVal=="0"){// 性别不限
+                    scdt="";
+                }
+                if(currtAttrName=="stage"&&currtAttrVal=="0"){// 人生阶段不限
+                    stgcdt="";stgFlag=false;
+                } else if(currtAttrName=="stage"&&currtAttrVal=="1"){// 人生阶段自定义
+                    stgFlag=true;
+                } else if(stgFlag){
+                    if(currtAttrVal!="0" && currtAttrVal!="1"){
+                        if (stgcdt!="") stgcdt += " OR ";
+                        stgcdt+="tags."+currtAttrVal+">0";
+                    }
+                }
+                if(currtAttrName=="hyd"&&currtAttrVal=="1"){
+                    $(".range-slider").jRange('enable');
+                } else if(currtAttrName=="hyd"&&currtAttrVal=="0") {
+                    $(".range-slider").jRange('setValue', '0,0');
+                    $(".range-slider").jRange('disable');
+                }
+            });
+            // 移动设备表单
+            var ppvals='', pcvals='', osvals='', netvals='', opvals='';
+            $("#mobileinfo_form input:checked").each(function () {
+                var crtName=$(this).attr("name"), crtValue=$(this).val();
+                // alert("name="+crtName+" value="+crtValue);
+                // 品牌
+                if(crtName=='telBrand'&&crtValue=='0'){
+                    ppvals='';
+                } else if (crtName=='ph_brand'&&crtValue!=''){
+                    if (ppvals.length>0) ppvals+=" OR ";
+                    ppvals+="tags."+crtValue+">0";
+                }
+                // 价格
+                if (crtName=='tel_price'&&crtValue=='0') {
+                    pcvals='';
+                } else if(crtName=='ph_price'&&crtValue!='') {
+                    if (pcvals.length>0) pcvals+=" OR ";
+                    pcvals+="tags."+crtValue+">0";
+                }
+                // 操作系统
+                if (crtName=='sys'&&crtValue=='0') {
+                    osvals='';
+                } else if(crtName=='ph_os'&&crtValue!='') {
+                    if (osvals.length>0) osvals+=" OR ";
+                    osvals+="tags."+crtValue+">0";
+                }
+                // 联网方式
+                if (crtName=='net'&&crtValue=='0') {
+                    netvals='';
+                } else if(crtName=='ph_net'&&crtValue!='') {
+                    if (netvals.length>0) netvals+=" OR ";
+                    netvals+="tags."+crtValue+">0";
+                }
+                // 运营商
+                if (crtName=='bs'&&crtValue=='0') {
+                    opvals='';
+                } else if(crtName=='ph_operator'&&crtValue!='') {
+                    if (opvals.length>0) opvals+=" OR ";
+                    opvals+="tags."+crtValue+">0";
+                }
+            });
+            // 兴趣偏好表单
+            var tree_xq_r_all_values = $("#tree_xq_r option").map(function () {
+                return "tags."+$(this).val()+">0";
+            }).get().join(" OR ");
+            var videoKeyWords=$("#video_kw").val();
+            var tree_cqdd_r_all_values = $("#tree_cqdd_r option").map(function () {
+                return "tags."+$(this).val()+">0";
+            }).get().join(" OR ");
+            // 来源表单
+            var tree_appfl_r_all_values = $("#tree_appfl_r option").map(function () {
+                return "tags."+$(this).val()+">0";
+            }).get().join(" OR ");
+            var chnelvals = "";
+            $("#source_form input:checked").each(function () {
+                var crtName=$(this).attr("name"), crtValue=$(this).val();
+                if (crtName=="way"&&crtValue=="0"){
+                    chnelvals="";
+                } else if (crtName=="chnel"&&crtValue!=""){
+                    if (chnelvals!="") chnelvals+= " OR ";
+                    chnelvals += "tags."+crtValue+">0";
+                }
+            });
+            var citiesvals = $("#tree_city_r option").map(function () {
+                if ($(this).val().length == 3){
+                    return "tags.SSP"+$(this).text()+">0";
+                } else if ($(this).val().length == 5) {
+                    return "tags.SSC"+$(this).text()+">0";
+                }
+            }).get().join(" OR ");
+
+            // 基本信息 -- 活跃度
+            var hydSql="";
+            hydcdt = $("#hyd").val();
+            if (hydcdt!="0,0"){
+                if (parseInt(hydcdt.split(",")[1])>=90){ // 最大值越大覆盖人数越多
+                    hydSql="tags.UU05>0";
+                } else {
+                    hydSql="tags.UU05>="+hydcdt.split(",")[0]+" AND tags.UU05<="+hydcdt.split(",")[1];
+                }
+            }else{
+                hydSql="tags.UU05>0";
+            }
+
+            // 总人数
+            var ctSql = "SELECT COUNT(*) AS ky FROM tag WHERE "+hydSql;
+            // 流量
+            var smSql = "SELECT SUM(tags.UU05) AS ky FROM tag WHERE "+hydSql;
+            if (scdt!=""){ // 性别
+                ctSql += " AND "+scdt;
+                smSql += " AND "+scdt;
+            }
+            if (stgcdt!=""){ // 人生阶段
+                ctSql += " AND ("+stgcdt+")";
+                smSql += " AND ("+stgcdt+")";
+            }
+            if (ppvals!="") { // 品牌
+                ctSql +=" AND ("+ppvals+")";
+                smSql += " AND ("+ppvals+")";
+            }
+            if (pcvals!="") { // 价格
+                ctSql +=" AND ("+pcvals+")";
+                smSql += " AND ("+pcvals+")";
+            }
+            if (osvals!="") { // 操作系统
+                ctSql += " AND ("+osvals+")";
+                smSql += " AND ("+osvals+")";
+            }
+            if (netvals!="") { // 联网方式
+                ctSql +=" AND ("+netvals+")";
+                smSql += " AND ("+netvals+")";
+            }
+            if (opvals!="") {  // 运营商
+                ctSql +=" AND ("+opvals+")";
+                smSql += " AND ("+opvals+")";
+            }
+            // 兴趣偏好 ES查询条件
+            if (tree_xq_r_all_values != ""){    // 兴趣爱好
+                ctSql += " AND ("+tree_xq_r_all_values+")";
+                smSql += " AND ("+tree_xq_r_all_values+")";
+            }
+            if (tree_cqdd_r_all_values != ""){  // 常去地点
+                ctSql += " AND ("+tree_cqdd_r_all_values+")";
+                smSql += " AND ("+tree_cqdd_r_all_values+")";
+            }
+            // 来源 ES查询条件
+            if (tree_appfl_r_all_values != "") { // 应用分类
+                ctSql += " AND ("+tree_appfl_r_all_values+")";
+                smSql += " AND ("+tree_appfl_r_all_values+")";
+            }
+            if (chnelvals != ""){ // 渠道
+                ctSql += " AND ("+chnelvals+")";
+                smSql += " AND ("+chnelvals+")";
+            }
+            if (citiesvals != ""){ // 区域
+                ctSql += " AND ("+citiesvals+")";
+                smSql += " AND ("+citiesvals+")";
+            }
+            // alert("1= "+ctSql);
+            // alert("2= "+smSql);
+
+            base_ajax(ctSql, function (err) {
+                alert(err);
+            }, function (data) {
+                number_animate("total_count", data.aggregations.ky.value);
+            });
+            base_ajax(smSql, function (err) {
+                alert(err);
+            }, function (data) {
+                number_animate("ll_count", data.aggregations.ky.value);
+            });
+        }
+        // 给指定的ID一个数字动画
+        function number_animate(id, value) {
+            var comma_separator_number_step = $.animateNumber.numberStepFactories.separator(',');
+            $('#'+id+'').animateNumber({
+                number: parseInt(value),
+                numberStep: comma_separator_number_step
+            }, 800);
         }
     </script>
 {% endblock %}

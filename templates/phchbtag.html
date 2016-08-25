@@ -1,5 +1,5 @@
 {% for d in dict_list %}
     <label class="{{ type }}-inline">
-        <input type="{{ type }}" name="{{ name }}" id="{{ name }}_{{ d.dictId }}" value="{{ d.dictId }}" disabled>{{ d.dictName }}&nbsp;&nbsp;
+        <input type="{{ type }}" name="{{ name }}" id="{{ name }}_{{ d.dictId }}" value="{{ d.dictId }}" onclick="baseinfo_click();" {% ifequal type 'checkbox' %}disabled{% endifequal %}>{{ d.dictName }}&nbsp;&nbsp;
     </label>
 {% endfor %}
