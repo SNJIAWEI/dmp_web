@@ -72,6 +72,7 @@ class ChannelInterest(models.Model):
     chnName = models.CharField(max_length=128, blank=True)
     chnStage = models.CharField(max_length=32, blank=True)
     chnInterest = models.CharField(max_length=256, blank=True)
+    chnSex = models.CharField(max_length=32, blank=True)
     isUsed = models.IntegerField(default=1, blank=True, null=True)
 
     def __str__(self):

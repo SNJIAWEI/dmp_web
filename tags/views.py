@@ -324,23 +324,29 @@ def interest_main(request):
     page = 1
     page_multi = 1
     search = ''
+    search_cname = ''
     try:
         if request.method == 'GET':
             page = int(request.GET.get('page', '1'))
             page_multi = int(request.GET.get('pageMulti', '1'))
             search = request.GET.get('q', '')
+            search_cname = request.GET.get('cname', '')
             if page < 1:
                 page = 1
         if request.method == 'POST':
             search = str(request.POST['q'])
+            search_cname = request.POST['cname']
     except:
         page = 1
         page_multi = 1
         search = ''
+        search_cname = ''
 
-    channel_list = ChannelInterest.objects.filter(isUsed=1).order_by("chnId", "chnName")
+    channel_list = ChannelInterest.objects.filter(isUsed=1).order_by("cId", "chnId")
     if len(search) > 0:
         channel_list = channel_list.filter(cId__in=search.split(","))
+    if len(search_cname) > 0:
+        channel_list = channel_list.filter(chnName__contains=search_cname)
 
     paginator = Paginator(channel_list, 15)
     try:
@@ -358,7 +364,7 @@ def interest_main(request):
         page_curt_range = range((page_multi - 1) * one_page_num + 1, paginator.num_pages + 1)
         has_next = False
     return render(request, 'interestinfo.html', {'channel': channel_page, 'page_curt_range': page_curt_range,
-                                                 'search_value': search, 'pageMulti': page_multi,
+                                                 'search_value': search, 'search_cname': search_cname,'pageMulti': page_multi,
                                                  'one_page_num': one_page_num, 'has_next': has_next})
 
 
@@ -371,6 +377,7 @@ def interest_edit(request):
             page = request.GET.get("p", 1)
             pagemulit = request.GET.get("pm", 1)
             search_value = request.GET.get('q', 1)
+            search_cname = request.GET.get('cname', '')
             channel_obj = ChannelInterest.objects.filter(isUsed=1).get(id=request.GET.get("id", None))
         else:
             pass
@@ -381,7 +388,7 @@ def interest_edit(request):
         print ex
     interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
     return render(request, "interestedit.html", {'interest_type_list': interest_type_list, 'page': page,
-                                                 'pageMulti': pagemulit, 'search_value': search_value,
+                                                 'pageMulti': pagemulit, 'search_value': search_value, 'search_cname': search_cname,
                                                  'chn_obj': channel_obj})
 
 
@@ -392,12 +399,14 @@ def interest_update(request):
     try:
         if request.method == 'POST':
             search_value = request.POST['q']
+            search_cname = request.POST['cname']
             page = int(request.POST['page'])
             pageMulti = int(request.POST['pageMulti'])
 
             chn_obj = ChannelInterest.objects.get(id=request.POST['id'])
             chn_obj.chnStage = request.POST['chnStage']
             chn_obj.chnInterest = request.POST['chnInterest']
+            chn_obj.chnSex = request.POST['chnSex']
             chn_obj.save()
             result = "success"
     except Exception, ex:
@@ -408,4 +417,4 @@ def interest_update(request):
         print ex
     messages.success(request, result)
     return HttpResponseRedirect("/dmp/interest/?page=" + str(page) + "&&pageMulti=" + str(pageMulti) + "&&q=" + str(
-        search_value))
+        search_value)+"&&cname="+search_cname)

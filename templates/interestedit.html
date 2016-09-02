@@ -56,6 +56,16 @@
                     </select>
                 </div>
             </div>
+
+            <div class="form-group">
+                <label for="inputPassword3" class="col-lg-2 control-label">性别</label>
+                <div class="col-lg-10">
+                    <select id="locationSex_" class="form-control" name="chnSex">
+                        {% dicts_tag '性别' chn_obj.chnSex %}
+                    </select>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label for="maxOption2" class="col-lg-2 control-label">兴趣分类</label>
                 <div class="col-lg-10">
@@ -88,6 +98,7 @@
                 <input type="hidden" name="page" value="{{ page }}"/>
                 <input type="hidden" name="pageMulti" value="{{ pageMulti }}"/>
                 <input type="hidden" name="q" value="{{ search_value }}"/>
+                <input type="hidden" name="cname" value="{{ search_cname }}"/>
                 <input type="hidden" id="chnInterest2" name="chnInterest"/>
                 <button type="button" class="btn btn-default" onclick="javascript:history.back();">返&nbsp;&nbsp;回
                 </button>
