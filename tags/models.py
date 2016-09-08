@@ -9,6 +9,7 @@ from django.utils.encoding import python_2_unicode_compatible
 class APPInfo(models.Model):
     appName = models.CharField(max_length=256, blank=True)
     appDesc = models.TextField(max_length=68, default='', blank=True)
+    appChnl = models.CharField(max_length=32, default='', blank=True, null=True)
     appType = models.CharField(max_length=68, blank=True, null=True)
     appBssIntr = models.CharField(max_length=68, blank=True, null=True)
     appSex = models.CharField(max_length=68, blank=True, null=True)

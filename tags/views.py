@@ -198,33 +198,13 @@ def struct_people_main(request):
     interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
     often_place_list = DMPDict.objects.filter(isUsed=1, dictType='常去地点').order_by("dictId")
     prov_city_list = DMPDict.objects.filter(isUsed=1, dictType='省市').order_by("dictId")
-
-    tree_xq_dict = {}
-    tree_xq_node_dict = {}
-    for itl in interest_type_list:
-        if len(itl.dictId) == 5:
-            tree_xq_dict[itl.dictId] = '{id: "%s", pId: 0, name: "%s", open: false, children:[temp_children]},' % (
-                itl.dictId, itl.dictName)
-        elif len(itl.dictId) == 9:
-            current_key = itl.dictId[0:5]
-            if tree_xq_node_dict.has_key(current_key):
-                current_cnode = tree_xq_node_dict[current_key]
-                tree_xq_node_dict[current_key] = current_cnode + '{id: "%s", name: "%s"},' % (itl.dictId, itl.dictName)
-            else:
-                tree_xq_node_dict[current_key] = '{id: "%s", name: "%s"},' % (itl.dictId, itl.dictName)
-        else:
-            pass
-
-    for k, v in tree_xq_dict.items():
-        if tree_xq_node_dict.has_key(k):
-            tree_xq_dict[k] = v.replace("temp_children", tree_xq_node_dict.get(k))
-        else:
-            tree_xq_dict[k] = v.replace("children:[temp_children]", "")
+    chnl_used_list = DMPDict.objects.filter(isUsed=1, dictType='渠道').order_by("dictId")
 
     return render(request, "structpeople.html", {"app_type_list": app_type_list,
-                                                 "interest_type_dict": tree_xq_dict,
+                                                 "interest_type_list": interest_type_list,
                                                  "often_place_list": often_place_list,
-                                                 "prov_city_list": prov_city_list})
+                                                 "prov_city_list": prov_city_list,
+                                                 "chnl_used_list": chnl_used_list})
 
 
 """ 标签管理 - 位置信息 """
