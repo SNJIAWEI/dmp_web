@@ -16,6 +16,8 @@ class APPInfo(models.Model):
     appStage = models.CharField(max_length=68, blank=True,null=True)
     appFlux = models.FloatField(default='0.0', blank=True, null=True)
     appFluxPer = models.FloatField(default='0.0', blank=True, null=True)
+    appAge = models.CharField(max_length=32, blank=True, null=True)
+    appMedium = models.CharField(max_length=32, blank=True, null=True)
     appUsed = models.IntegerField(default='1', blank=True, null=True)
 
     def __str__(self):
@@ -58,7 +60,7 @@ class LocationInfo(models.Model):
     locationFlux = models.FloatField(default=0.0, blank=True, null=True)
     locationFluxPer = models.FloatField(default=0.0, blank=True, null=True)
     isUsed = models.IntegerField(default=1, blank=True, null=True)
-
+    locationAge = models.CharField(max_length=32, blank=True, null=True)
     def __str__(self):
         return self.location
 
@@ -75,6 +77,23 @@ class ChannelInterest(models.Model):
     chnInterest = models.CharField(max_length=256, blank=True)
     chnSex = models.CharField(max_length=32, blank=True)
     isUsed = models.IntegerField(default=1, blank=True, null=True)
-
+    chnAge = models.CharField(max_length=32, blank=True, null=True)
     def __str__(self):
         return self.cName + "," + self.chnName
+
+
+@python_2_unicode_compatible
+class StructHuman(models.Model):
+    name = models.CharField(max_length=128, blank=True, null=True)
+    desc = models.CharField(max_length=1000, blank=True, null=True)
+    # base = models.CharField(max_length=1000, blank=True, null=True)
+    # mobile = models.CharField(max_length=1000, blank=True, null=True)
+    # instr = models.CharField(max_length=1000, blank=True, null=True)
+    # source = models.CharField(max_length=1000, blank=True, null=True)
+    search = models.CharField(max_length=3000, blank=True, null=True)
+    humanCount = models.CharField(max_length=68, blank=True, null=True)
+    humanFlux = models.CharField(max_length=68, blank=True, null=True)
+    updateTime = models.CharField(max_length=32, blank=True, null=True)
+
+    def __str__(self):
+        return self.name+">"+self.desc+">"+self.search+">"+self.humanCount+">"+self.humanFlux+">"+self.updateTime

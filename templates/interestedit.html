@@ -49,6 +49,14 @@
                 </div>
             </div>
             <div class="form-group">
+                <label for="inputPassword3" class="col-lg-2 control-label">年龄段</label>
+                <div class="col-lg-10">
+                    <select id="chnAge_" class="form-control" name="chnAge">
+                        {% dicts_tag '年龄段' chn_obj.chnAge %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
                 <label for="inputPassword3" class="col-lg-2 control-label">人生状态</label>
                 <div class="col-lg-10">
                     <select id="locationStage_" class="form-control" name="chnStage">

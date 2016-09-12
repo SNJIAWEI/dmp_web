@@ -110,9 +110,10 @@
             <th width="8%">渠道ID</th>
             <th width="8%">渠道名称</th>
             <th>频道ID</th>
-            <th width="16%">频道名称</th>
-            <th width="22%">兴趣分类</th>
+            <th width="20%">频道名称</th>
+            <th width="20%">兴趣分类</th>
             <th>性别</th>
+            <th>年龄段</th>
             <th>人生阶段</th>
             <th width="8%">操作</th>
         </tr>
@@ -129,6 +130,7 @@
                 <td title="{{ all_name }}">{{ all_name }}</td>
                 {% endwith %}
                 <td>{{ c.chnSex|dict_name:'性别' }}</td>
+                <td>{{ c.chnAge|dict_name:'年龄段' }}</td>
                 <td>{{ c.chnStage|dict_name:'人生阶段' }}</td>
                 <td>
                     <a href="/dmp/interest/edit/?id={{ c.id }}&&p={{ channel.number }}&&pm={{ pageMulti }}&&q={{ search_value }}&&cname={{ search_cname }}"

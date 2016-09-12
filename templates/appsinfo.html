@@ -106,13 +106,15 @@
     <table class="table table-hover">
         <thead>
         <tr>
-            <th width="6%">序号</th>
-            <th width="14%">APP标识</th>
-            <th >渠道</th>
-            <th width="20%">APP描述</th>
+            <th width="4%">序号</th>
+            <th width="10%">APP标识</th>
+            <th>渠道</th>
+            <th>媒介</th>
+            <th width="10%">APP描述</th>
             <th width="6%">类别</th>
             <th>兴趣分类</th>
             <th width="5%">性别</th>
+            <th>年龄段</th>
             <th width="7%">人生状态</th>
             <th width="10%">流量</th>
             <th width="8%">流量占比</th>
@@ -125,6 +127,9 @@
                 <td>{% current_index forloop.counter one_page_num apps.number %}</td>
                 <td title="{{ app.appName }}">{{ app.appName }}</td>
                 <td title="{{ app.appChnl }}">{{ app.appChnl }}</td>
+                <td title="{{ app.appMedium }}">
+                    {{ app.appMedium|dict_name:'媒体' }}
+                </td>
                 <td title="{{ app.appDesc }}">{{ app.appDesc }}</td>
                 <td>
                     {{ app.appType|dict_name:'APP类别' }}
@@ -136,6 +141,9 @@
                 {% endwith %}
                 <td>
                     {{ app.appSex|dict_name:'性别' }}
+                </td>
+                <td>
+                    {{ app.appAge|dict_name:'年龄段' }}
                 </td>
                 <td>
                     {{ app.appStage|dict_name:'人生阶段' }}

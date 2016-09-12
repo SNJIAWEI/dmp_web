@@ -1,16 +1,16 @@
 # coding: utf-8
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, InvalidPage
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
-from tags.models import APPInfo, DMPDict, PhoneInfo, LocationInfo, ChannelInterest
+from tags.models import APPInfo, DMPDict, PhoneInfo, LocationInfo, ChannelInterest, StructHuman
+import time
 
 # Create your views here.
 one_page_num = 15
+ISOTIMEFORMAT='%Y-%m-%d %X'
 
-""" APP查询 """
-
-
+## APP查询
 def appsinfo_main(request):
     page = 1
     page_multi = 1
@@ -59,9 +59,7 @@ def appsinfo_main(request):
                                              'has_next': has_next})
 
 
-""" APP编辑 """
-
-
+##  APP编辑
 def app_edit(request):
     try:
         page = request.GET.get("p", 1)
@@ -82,9 +80,7 @@ def app_edit(request):
                                              'search_appn': search_appn})
 
 
-""" APP更新 """
-
-
+##  APP更新
 def app_update(request):
     if request.method == 'POST':
         try:
@@ -98,7 +94,8 @@ def app_update(request):
             appInfo_obj.appBssIntr = request.POST['appBssIntr']
             appInfo_obj.appSex = request.POST['appSex']
             appInfo_obj.appStage = request.POST['appStage']
-
+            appInfo_obj.appAge = request.POST['appAge']
+            appInfo_obj.appMedium = request.POST['appMedium']
             appInfo_obj.save()
             result = 'success'
         except Exception, ex:
@@ -113,9 +110,7 @@ def app_update(request):
         search_value) + "&&appn=" + unicode(search_appn))
 
 
-""" 手机标注 - 列表页 """
-
-
+##  手机标注 - 列表页
 def phoneinfo_main(request):
     try:
         page = int(request.GET.get('page', '1'))
@@ -148,9 +143,7 @@ def phoneinfo_main(request):
                                               'has_next': has_next})
 
 
-""" 手机编辑 """
-
-
+##  手机编辑
 def phone_edit(request):
     try:
         page = request.GET.get("p", 1)
@@ -165,9 +158,7 @@ def phone_edit(request):
     return render(request, "phonedit.html", {'telObj': phone_obj, 'page': page, 'pageMulti': pagemulit})
 
 
-""" 手机编辑 - 保存 """
-
-
+## 手机编辑 - 保存
 def phone_update(request):
     if request.method == 'POST':
         try:
@@ -190,9 +181,7 @@ def phone_update(request):
     return HttpResponseRedirect("/dmp/phoneinfo/?page=" + str(page) + "&&pageMulti=" + str(pageMulti))
 
 
-""" 人群构建 """
-
-
+## 人群构建
 def struct_people_main(request):
     app_type_list = DMPDict.objects.filter(isUsed=1, dictType='APP类别').order_by("dictId")
     interest_type_list = DMPDict.objects.filter(isUsed=1, dictType='兴趣分类').order_by("dictId")
@@ -207,9 +196,25 @@ def struct_people_main(request):
                                                  "chnl_used_list": chnl_used_list})
 
 
-""" 标签管理 - 位置信息 """
+## 人群构建 - 保存
+def save_struct_condition(request):
+    mssg = {'message': '保存成功啦!'}
+    if request.method == 'POST':
+        humanName = request.POST['humanName']
+        humanDesc = request.POST['humanDesc']
+        human = StructHuman.objects.create(name=humanName, desc=humanDesc)
+        human.search = request.POST['humanCondition']
+        human.humanCount = request.POST['humanCount']
+        human.humanFlux = request.POST['humanFlux']
+        human.updateTime = time.strftime(ISOTIMEFORMAT,time.localtime())
+        print humanName, humanDesc
+        human.save()
+    else:
+        mssg = {'message': '保存失败啦!'}
+    return JsonResponse(mssg)
 
 
+##  标签管理 - 位置信息
 def locations_main(request):
     locations_dict = DMPDict.objects.filter(dictType='常去地点')
     locations_list = LocationInfo.objects.all()
@@ -246,11 +251,7 @@ def locations_main(request):
     return render(request, "locations.html", {"locations": locations_list})
 
 
-"""
-    标签管理 - 位置信息 [编辑]
-"""
-
-
+## 标签管理 - 位置信息 [编辑]
 def locations_edit(request):
     location_obj = ''
     try:
@@ -267,17 +268,14 @@ def locations_edit(request):
                                               'location_obj': location_obj, 'anchor': anchor})
 
 
-"""
-    标签管理 - 位置信息 [编辑-保存]
-"""
-
-
+##  标签管理 - 位置信息 [编辑-保存]
 def locations_update(request):
     try:
         if request.method == 'POST':
             locat_obj = LocationInfo.objects.get(id=request.POST['locationId'])
             locat_obj.locationStage = request.POST['locationStage']
             locat_obj.locationInterest = request.POST['locationInterest']
+            locat_obj.locationAge = request.POST['locationAge']
 
             locat_obj.save()
             result = "success"
@@ -290,16 +288,12 @@ def locations_update(request):
     return HttpResponseRedirect("/dmp/locations/#" + request.POST['m'])
 
 
-""" 标签管理 - 广告信息 """
-
-
+## 标签管理 - 广告信息
 def ads_main(request):
     return render(request, "adsinfo.html")
 
 
-""" 标签管理 - 兴趣映射 """
-
-
+## 标签管理 - 兴趣映射
 def interest_main(request):
     page = 1
     page_multi = 1
@@ -348,9 +342,7 @@ def interest_main(request):
                                                  'one_page_num': one_page_num, 'has_next': has_next})
 
 
-""" 标签管理 - 兴趣映射 - 编辑 """
-
-
+##   标签管理 - 兴趣映射 - 编辑
 def interest_edit(request):
     try:
         if request.method == 'GET':
@@ -372,9 +364,7 @@ def interest_edit(request):
                                                  'chn_obj': channel_obj})
 
 
-""" 标签管理 - 兴趣映射 - 提交 """
-
-
+##  标签管理 - 兴趣映射 - 提交
 def interest_update(request):
     try:
         if request.method == 'POST':
@@ -387,6 +377,7 @@ def interest_update(request):
             chn_obj.chnStage = request.POST['chnStage']
             chn_obj.chnInterest = request.POST['chnInterest']
             chn_obj.chnSex = request.POST['chnSex']
+            chn_obj.chnAge = request.POST['chnAge']
             chn_obj.save()
             result = "success"
     except Exception, ex:

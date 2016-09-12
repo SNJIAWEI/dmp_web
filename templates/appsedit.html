@@ -96,6 +96,15 @@
                     </select>
                 </div>
             </div>
+
+            <div class="form-group">
+                <label for="inputPassword3" class="col-lg-2 control-label">年龄段</label>
+                <div class="col-lg-10">
+                    <select id="appAge_{{ app.id }}" class="form-control" name="appAge">
+                        {% dicts_tag '年龄段' app.appAge %}
+                    </select>
+                </div>
+            </div>
             <div class="form-group">
                 <label for="inputPassword3" class="col-lg-2 control-label">人生状态</label>
                 <div class="col-lg-10">
@@ -103,8 +112,16 @@
                         {% dicts_tag '人生阶段' app.appStage %}
                     </select>
                 </div>
-            </div><br>
-
+            </div>
+            <div class="form-group">
+                <label for="inputPassword3" class="col-lg-2 control-label">媒介</label>
+                <div class="col-lg-10">
+                    <select id="appMedium_{{ app.id }}" class="form-control" name="appMedium">
+                        {% dicts_tag '媒体' app.appMedium %}
+                    </select>
+                </div>
+            </div>
+            <br>
             <div class="modal-footer ">
                 <input type="hidden" name="q" value="{{ search_value }}"/>
                 <input type="hidden" name="appn" value="{{ search_appn }}"/>
