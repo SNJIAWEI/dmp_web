@@ -1,13 +1,15 @@
 # coding: utf-8
-import json
-import urllib
+import json, urllib, time, os, tempfile, zipfile, shutil
 
 from django.contrib import messages
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, InvalidPage
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render
+# from django.core.servers.basehttp import FileWrapper
+from wsgiref.util import FileWrapper
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, InvalidPage
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, StreamingHttpResponse
 from tags.models import APPInfo, DMPDict, PhoneInfo, LocationInfo, ChannelInterest, StructHuman
-import time
+
+
 import sys
 reload(sys)
 sys.setdefaultencoding( "utf-8" )
@@ -535,16 +537,86 @@ def human_export(request):
         humanObj = StructHuman.objects.get(id=request.GET.get("id"))
         result = urllib.urlopen("http://58.61.152.2:9210/_sql?sql=SELECT%20IMEI,IMEIMD5,MAC,PUID%20FROM%20test%20WHERE%20MAC%20is%20not%20null")
         result_jsons =json.loads(result.read())["hits"]["hits"]
-        data = []
+        data_imei = []
+        data_imeimd5 = []
+        data_mac = []
+        data_puid = []
         for k in result_jsons:
-            data.append(k["_source"]["IMEI"]+","+k["_source"]["IMEIMD5"]+","+k["_source"]["MAC"]+","+k["_source"]["PUID"]+"\n")
+            if str(k["_source"]["IMEI"]).strip():
+                data_imei.append(k["_source"]["IMEI"])
+            if str(k["_source"]["IMEIMD5"]).strip():
+                data_imeimd5.append(k["_source"]["IMEIMD5"])
+            if str(k["_source"]["MAC"]).strip():
+                data_mac.append(k["_source"]["MAC"])
+            if str(k["_source"]["PUID"]):
+                data_puid.append(k["_source"]["PUID"])
 
-        response = HttpResponse(data, content_type="application/octet-stream")
-        response['Content-Disposition'] = 'attachment; filename={0}.txt'.format(humanObj.name)
+        if len(data_imei)>0 or len(data_imeimd5)>0 or len(data_mac)>0 or len(data_puid)>0:
+            try:
+                dirname = "downloadzip/zip"+str(humanObj.id)
+                if os.path.exists(dirname):
+                    shutil.rmtree(dirname)
+                os.makedirs(dirname)
+            except OSError, osr:
+                pass
 
-        # 下载Zip文件, IMEI、IMEIMD5、MAC分文单独的文件存储
-        temp = tempfile
+            if len(data_imei)>0:
+                imei_file_name = "/%s.txt" % str("IMEI")
+                imei_file = open(dirname+imei_file_name, 'w')
+                for imei in data_imei:
+                    imei_file.write(str(imei)+"\n")
+                imei_file.close()
 
+            if len(data_imeimd5) > 0:
+                imeimd5_file_name = "/%s.txt" % str("IMEIMD5")
+                imeimd5_file = open(dirname + imeimd5_file_name, 'w')
+                for imeiMD5 in data_imeimd5:
+                    imeimd5_file.write(str(imeiMD5) + "\n")
+                imeimd5_file.close()
+
+            if len(data_mac) > 0:
+                mac_file_name = "/%s.txt" % str("MAC")
+                mac_file = open(dirname + mac_file_name, 'w')
+                for mac in data_mac:
+                    mac_file.write(str(mac) + "\n")
+                mac_file.close()
+
+            if len(data_puid) > 0:
+                puid_file_name = "/%s.txt" % str("PUID")
+                puid_file = open(dirname+ puid_file_name, 'w')
+                for puid in data_puid:
+                    puid_file.write(str(puid) + "\n")
+                puid_file.close()
+        else:
+            pass
+
+        filelist = []
+        if os.path.isfile(dirname):
+            filelist.append(dirname)
+        else:
+            for root, dirs, files in os.walk(dirname):
+                for name in files:
+                    filelist.append(os.path.join(root, name))
+
+        zipFileName = "downloadzip/"+ humanObj.name+".zip"
+        zf = zipfile.ZipFile(zipFileName, "w", zipfile.zlib.DEFLATED)
+        for tar in filelist:
+            arcname = tar[len(dirname):]
+            zf.write(tar, arcname)
+        zf.close()
+
+        def file_iterator(file_name, chunk_size=512):
+            with open(file_name) as f:
+                while True:
+                    c = f.read(chunk_size)
+                    if c:
+                        yield c
+                    else:
+                        break
+
+        response = StreamingHttpResponse(file_iterator(zipFileName))
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment; filename={0}.zip'.format(humanObj.name)
 
     return response
 
