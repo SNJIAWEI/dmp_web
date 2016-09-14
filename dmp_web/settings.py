@@ -25,7 +25,7 @@ SECRET_KEY = 'i4mz)z!e*%x50cf^!hzr*07=3i^1_$i%@e3_(y_83@eq)@veq9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+# 'localhost','127.0.0.1','www.vpointmedia.com'
 ALLOWED_HOSTS = []
 
 

@@ -1,10 +1,17 @@
 # coding: utf-8
+import json
+import urllib
+
 from django.contrib import messages
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, InvalidPage
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render
 from tags.models import APPInfo, DMPDict, PhoneInfo, LocationInfo, ChannelInterest, StructHuman
 import time
+import sys
+reload(sys)
+sys.setdefaultencoding( "utf-8" )
+
 
 # Create your views here.
 one_page_num = 15
@@ -389,3 +396,155 @@ def interest_update(request):
     messages.success(request, result)
     return HttpResponseRedirect("/dmp/interest/?page=" + str(page) + "&&pageMulti=" + str(pageMulti) + "&&q=" + str(
         search_value)+"&&cname="+search_cname)
+
+
+## 人群分析
+def human_analyse(request):
+    page = 1
+    page_multi = 1
+    searchContent = ''
+    try:
+        if request.method == 'GET':
+            page = int(request.GET.get('page', '1'))
+            page_multi = int(request.GET.get('pageMulti', '1'))
+            searchContent = request.GET.get('hmName', '')
+            if page < 1:
+                page = 1
+        if request.method == 'POST':
+            searchContent = request.POST['hmName']
+    except:
+        page = 1
+        page_multi = 1
+
+    human_analyse_list = StructHuman.objects.all().order_by("-id")
+    if len(searchContent) > 0:
+        human_analyse_list = human_analyse_list.filter(name__contains=searchContent)
+
+    paginator = Paginator(human_analyse_list, 15)
+    try:
+        human_analyse_page = paginator.page(page)
+    except PageNotAnInteger:
+        human_analyse_page = paginator.page(1)
+    except (EmptyPage, InvalidPage):
+        human_analyse_page = paginator.page(paginator.num_pages)
+
+    has_next = True
+    # 总页数大于需要显示的页数
+    if one_page_num * page_multi <= paginator.num_pages:
+        page_curt_range = range((page_multi - 1) * one_page_num + 1, page_multi * one_page_num + 1)
+    else:
+        page_curt_range = range((page_multi - 1) * one_page_num + 1, paginator.num_pages + 1)
+        has_next = False
+    return  render(request, "humananalyse.html", {'humans': human_analyse_page, 'page_curt_range': page_curt_range,
+                                             'search_value': searchContent, 'pageMulti': page_multi, 'one_page_num': one_page_num,
+                                             'has_next': has_next});
+
+## 删除操作
+def human_delete(request):
+    page = 1
+    page_multi = 1
+    searchContent = ''
+    try:
+        if request.method == 'GET':
+            page = int(request.GET.get('page', '1'))
+            page_multi = int(request.GET.get('pageMulti', '1'))
+            searchContent = request.GET.get('hmName', '')
+            StructHuman.objects.get(id=request.GET.get('id', '')).delete()
+            if page < 1:
+                page = 1
+            else:
+                pass
+    except:
+        page = 1
+        page_multi = 1
+
+    human_analyse_list = StructHuman.objects.all().order_by("-id")
+    if len(searchContent) > 0:
+        human_analyse_list = human_analyse_list.filter(name__contains=searchContent)
+
+    paginator = Paginator(human_analyse_list, 15)
+    try:
+        human_analyse_page = paginator.page(page)
+    except PageNotAnInteger:
+        human_analyse_page = paginator.page(1)
+    except (EmptyPage, InvalidPage):
+        human_analyse_page = paginator.page(paginator.num_pages)
+
+    has_next = True
+    # 总页数大于需要显示的页数
+    if one_page_num * page_multi <= paginator.num_pages:
+        page_curt_range = range((page_multi - 1) * one_page_num + 1, page_multi * one_page_num + 1)
+    else:
+        page_curt_range = range((page_multi - 1) * one_page_num + 1, paginator.num_pages + 1)
+        has_next = False
+    return render(request, "humananalyse.html", {'humans': human_analyse_page, 'page_curt_range': page_curt_range,
+                                                 'search_value': searchContent, 'pageMulti': page_multi,
+                                                 'one_page_num': one_page_num,
+                                                 'has_next': has_next});
+
+## 更新
+def human_update(request):
+    page = 1
+    page_multi = 1
+    searchContent = ''
+    try:
+        if request.method == 'GET':
+            page = int(request.GET.get('page', '1'))
+            page_multi = int(request.GET.get('pageMulti', '1'))
+            searchContent = request.GET.get('hmName', '')
+
+            shuman = StructHuman.objects.get(id=request.GET.get('id', ''))
+            shuman.humanCount = request.GET.get('tc', '0')
+            shuman.humanFlux = request.GET.get('lc', '0')
+            shuman.updateTime = time.strftime(ISOTIMEFORMAT,time.localtime())
+            shuman.save()
+            if page < 1:
+                page = 1
+            else:
+                pass
+    except:
+        page = 1
+        page_multi = 1
+
+    human_analyse_list = StructHuman.objects.all().order_by("-id")
+    if len(searchContent) > 0:
+        human_analyse_list = human_analyse_list.filter(name__contains=searchContent)
+
+    paginator = Paginator(human_analyse_list, 15)
+    try:
+        human_analyse_page = paginator.page(page)
+    except PageNotAnInteger:
+        human_analyse_page = paginator.page(1)
+    except (EmptyPage, InvalidPage):
+        human_analyse_page = paginator.page(paginator.num_pages)
+
+    has_next = True
+    # 总页数大于需要显示的页数
+    if one_page_num * page_multi <= paginator.num_pages:
+        page_curt_range = range((page_multi - 1) * one_page_num + 1, page_multi * one_page_num + 1)
+    else:
+        page_curt_range = range((page_multi - 1) * one_page_num + 1, paginator.num_pages + 1)
+        has_next = False
+    return render(request, "humananalyse.html", {'humans': human_analyse_page, 'page_curt_range': page_curt_range,
+                                                 'search_value': searchContent, 'pageMulti': page_multi,
+                                                 'one_page_num': one_page_num,
+                                                 'has_next': has_next});
+
+def human_export(request):
+    if request.method == "GET":
+        humanObj = StructHuman.objects.get(id=request.GET.get("id"))
+        result = urllib.urlopen("http://58.61.152.2:9210/_sql?sql=SELECT%20IMEI,IMEIMD5,MAC,PUID%20FROM%20test%20WHERE%20MAC%20is%20not%20null")
+        result_jsons =json.loads(result.read())["hits"]["hits"]
+        data = []
+        for k in result_jsons:
+            data.append(k["_source"]["IMEI"]+","+k["_source"]["IMEIMD5"]+","+k["_source"]["MAC"]+","+k["_source"]["PUID"]+"\n")
+
+        response = HttpResponse(data, content_type="application/octet-stream")
+        response['Content-Disposition'] = 'attachment; filename={0}.txt'.format(humanObj.name)
+
+        # 下载Zip文件, IMEI、IMEIMD5、MAC分文单独的文件存储
+        temp = tempfile
+
+
+    return response
+

@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block privateJsAndCss %}
+    <script src="http://cdn.bootcss.com/messenger/1.5.0/js/messenger.min.js"></script>
+    <link href="http://cdn.bootcss.com/messenger/1.5.0/css/messenger.css" rel="stylesheet">
+    <link href="http://cdn.bootcss.com/messenger/1.5.0/css/messenger-theme-future.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static "selectpicker/css/bootstrap-select.css" %}">
+    <script src="{% static "selectpicker/js/bootstrap-select.min.js" %}"></script>
+    <script src="{% static "selectpicker/js/i18n/defaults-zh_CN.min.js" %}"></script>
+    <script>
+        $._messengerDefaults = {
+            extraClasses: 'messenger-fixed messenger-theme-future messenger-on-top messenger-on-right'
+        }
+        function updateSearch(conditions) {
+            var search_sql = "SELECT COUNT(*) AS ky1,SUM(tags.UU05) as ky3 FROM tag";
+            if (conditions != "") {
+                search_sql += " where " + conditions;
+            }
+            base_ajax(search_sql, function (err) {
+                console.error(err);
+                alert("更新失败!");
+            }, function (data) {
+                var total_count = data.aggregations.ky1.value;
+                var ll_count = data.aggregations.ky3.value;
+                var $update = $("#updateSch").attr("href");
+                $("#updateSch").attr("href", $update+"&&tc="+total_count+"&&lc="+ll_count);
+                alert("更新成功!");
+            });
+        }
+    </script>
+{% endblock %}
+
+{% block currentNav %}
+    <li><a href="#">总览</a></li>
+    <li><a href="/dmp/structmans/">人群构建</a></li>
+    <li class="active"><a href="/dmp/humananalyse/">人群分析</a></li>
+    <li><a href="#">用户画像</a></li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 数据字典 <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li><a href="/dmp/phoneinfo/">手机标注</a></li>
+            <li class="active"><a href="#">APP标注</a></li>
+            <li><a href="/dmp/locations/">位置信息</a></li>
+            {#            <li><a href="/dmp/ads/">广告信息</a></li>#}
+            <li><a href="/dmp/interest/">兴趣映射</a></li>
+        </ul>
+    </li>
+    <li><a href="#">工具</a></li>
+    <li><a href="/admin" target="_blank">管理</a></li>
+{% endblock %}
+
+{% block contentPage %}
+    {% for msg in messages %}
+        {% ifequal msg.message 'success' %}
+            <script>
+                $.globalMessenger().post({
+                    message: "Successfully !",
+                    type: "success",
+                    showCloseButton: false,
+                    hideAfter: 3,
+                    hideOnNavigate: true
+                });
+            </script>
+        {% else %}
+            <script>
+                $.globalMessenger().post({
+                    message: "Update failed ! please try again !",
+                    type: "error",
+                    showCloseButton: false,
+                    hideAfter: 3,
+                    hideOnNavigate: true
+                });
+            </script>
+        {% endifequal %}
+    {% endfor %}
+    {% load dictLibs %}
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#"></a>
+            </div>
+            <form id="search" class="navbar-form navbar-left" role="search" method="post"
+                  action="/dmp/humananalyse/">{% csrf_token %}
+                <div class="form-group">
+                    <input type="text" name="hmName" id="hmName" value="{{ search_value }}" class="form-control"
+                           placeholder="请输入名称">
+                </div>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </nav>
+
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th width="5%">序号</th>
+            <th>名称</th>
+            <th>描述</th>
+            <th width="10%">人数</th>
+            <th width="10%">流量</th>
+            <th width="13%">更新时间</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for hm in humans %}
+            <tr><!-- success|error|warning|info -->
+                <td>{% current_index forloop.counter one_page_num humans.number %}</td>
+                <td title="{{ hm.name }}">{{ hm.name }}</td>
+                <td title="{{ hm.desc }}">{{ hm.desc }}</td>
+                <td title="{{ hm.humanCount }}">{{ hm.humanCount }}</td>
+                <td title="{{ hm.humanFlux }}">{{ hm.humanFlux }}</td>
+                <td title="{{ hm.updateTime }}">{{ hm.updateTime }}</td>
+                <td>
+                    <a href="/dmp/humananalyse/edit/?id={{ hm.id }}&&p={{ humans.number }}&&pm={{ pageMulti }}&&hmName={{ search_value }}"
+                       role="button" data-toggle="modal">查看</a>&nbsp;&nbsp;
+                    <a href="/dmp/humananalyse/update/?id={{ hm.id }}&&p={{ humans.number }}&&pm={{ pageMulti }}&&hmName={{ search_value }}"
+                       role="button" data-toggle="modal" onclick="updateSearch('{{ hm.search }}');" id="updateSch">更新</a>&nbsp;&nbsp;
+                    <a href="/dmp/humananalyse/export/?id={{ hm.id }}&&p={{ humans.number }}&&pm={{ pageMulti }}&&hmName={{ search_value }}"
+                       role="button" data-toggle="modal">导出</a>&nbsp;&nbsp;
+                    <a href="/dmp/humananalyse/delete/?id={{ hm.id }}&&p={{ humans.number }}&&pm={{ pageMulti }}&&hmName={{ search_value }}"
+                       role="button" data-toggle="modal" onclick="javascript:if(confirm('确认删除吗?')){return true;}else{return false;}">删除</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <nav>
+        <ul class="pagination">
+            {% if pageMulti > 1 %}
+                <li>
+                    <a href="?page={% widthratio pageMulti|add:-1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'-1' }}&&hmName={{ search_value }}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">上一页</span>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for page in page_curt_range %}
+                {% if page %}
+                    {% ifequal page humans.number %}
+                        <li class="active"><a href="#">{{ page }}</a></li>
+                    {% else %}
+                        <li>
+                            <a href="?page={{ page }}&&pageMulti={{ pageMulti }}&&q={{ search_value }}&&hmName={{ search_value }}">{{ page }}</a>
+                        </li>
+                    {% endifequal %}
+                {% endif %}
+            {% endfor %}
+
+            {% if has_next %}
+                <li>
+                    <a href="?page={% widthratio pageMulti|add:1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'1' }}&&hmName={{ search_value }}"
+                       aria-label="Next">
+                        <span aria-hidden="true">下一页</span>
+                    </a>
+                </li>
+                <li><label class="label label-primary"
+                           style="margin-left: 50px;font-size: 12px;">当前第 {{ humans.number }} 页,
+                    总 {{ humans.paginator.num_pages }} 页。</label></li>
+            {% endif %}
+        </ul>
+        <ul></ul>
+    </nav>
+
+{% endblock %}

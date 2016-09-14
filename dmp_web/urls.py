@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^dmp/phoneinfo/update/$', dmp.phone_update),
 
     url(r'^dmp/structmans/$', dmp.struct_people_main),
+    url(r'^dmp/structmans/ajax_save/$', dmp.save_struct_condition),
 
     url(r'^dmp/locations/$', dmp.locations_main),
     url(r'^dmp/locations/edit/$', dmp.locations_edit),
@@ -39,4 +40,9 @@ urlpatterns = [
     url(r'^dmp/interest/$', dmp.interest_main),
     url(r'^dmp/interest/edit/$', dmp.interest_edit),
     url(r'^dmp/interest/update/$', dmp.interest_update),
+
+    url(r'^dmp/humananalyse/$', dmp.human_analyse),
+    url(r'^dmp/humananalyse/delete/$', dmp.human_delete),
+    url(r'^dmp/humananalyse/update/$', dmp.human_update),
+    url(r'^dmp/humananalyse/export/$', dmp.human_export),
 ]

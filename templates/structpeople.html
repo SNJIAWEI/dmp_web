@@ -2,7 +2,7 @@
 {% block currentNav %}
     <li><a href="#">总览</a></li>
     <li class="active"><a href="#">人群构建</a></li>
-    <li><a href="#">人群分析</a></li>
+    <li><a href="/dmp/humananalyse/">人群分析</a></li>
     <li><a href="#">用户画像</a></li>
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 数据字典 <b class="caret"></b></a>
@@ -451,6 +451,7 @@
                         <input type="hidden" id="humanCount" name="humanCount" value="0">
                         <input type="hidden" id="humanFlux" name="humanFlux" value="0">
                         <button type="button" onclick="humanBtnEvent('save');" id="humanSavebtn" class="btn btn-primary btn-sm">保存</button>
+{#                        <button type="button" onclick="humanBtnEvent('export');"  id="resetHumanbtn" class="btn btn-success btn-sm">导出</button>#}
                         <button type="button" onclick="humanBtnEvent('reset');"  id="resetHumanbtn" class="btn btn-default btn-sm">重置</button>
                     </div>
                 </div>
