@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block currentNav %}
     <li><a href="#">总览</a></li>
-    <li class="active"><a href="#">人群构建</a></li>
+    <li class="active"><a href="/dmp/structmans/">人群构建</a></li>
     <li><a href="/dmp/humananalyse/">人群分析</a></li>
     <li><a href="#">用户画像</a></li>
     <li class="dropdown">
@@ -368,7 +368,7 @@
                                     <input type="radio" name="mediaR" id="media_1" value="1"
                                            onclick="disabledOnoff('media', 1);">自定义&nbsp;&nbsp;
                                 </label>
-                                {% dict_phone '媒体' 'media' 'checkbox' %}
+                                {% dict_phone '媒介' 'media' 'checkbox' %}
                             </div>
                         </div>
 
@@ -521,6 +521,7 @@
 {% endblock %}
 {% block bottomJscript %}
     <script type="text/javascript">
+        var need_save_condition = "", need_save_updateSql = "";
         var trcss = ['active', 'success', 'info', 'warning', 'danger'];
         var setting = {
             view: {
@@ -737,9 +738,10 @@
             $("#" + selectId + " option:selected").remove();
             baseinfo_click();
         }
-
+        // 页面初始化数据
         function ajax_search_es_baseinfo() {
-            var sql = "SELECT COUNT(*) AS ky1,SUM(tags.UU05) as ky3 FROM tag";// 总人数 //,SUM(tags.UU19) AS ky2
+            var sql = "SELECT COUNT(*) AS ky1,SUM(flow) as ky3 FROM test2";// 总人数 //,SUM(tags.UU19) AS ky2
+            need_save_updateSql = sql;
             base_ajax(sql, function (err) {
                 console.error(err);
             }, function (data) {
@@ -749,14 +751,12 @@
                 number_animate("ll_count", data.aggregations.ky3.value);
             });
 
-            var instHistSql = "SELECT tags.inst FROM tag where tags.UU05>0 and tags.inst is not null group by tags.inst limit 8";
+            var instHistSql = "SELECT inst FROM test2 where inst is not null group by inst limit 10";
             base_ajax(instHistSql, function (err) {
                 alert("访问Elasticsearch服务异常, 请重试!");
             }, function (data) {
-                var r = JSON.stringify(data.aggregations);
-                // alert(r.replace("tags.inst", "k"));
-                var robj = JSON.parse(r.replace("tags.inst", "k")).k;
-                // alert(robj.buckets.length);
+                //var r = JSON.stringify(data.aggregations);
+                var robj = data.aggregations.inst;
                 var item = new Array();
                 var itemVal = new Array();
                 for (var i = 0; i < robj.buckets.length; i++) {
@@ -788,24 +788,32 @@
             var chnlNames = chnlName.split(",");
             var chnlNames2 = new Array();
             var chnlResult = new Array();
+            var firstAllQDIdSum = "";
             for (var k = 0; k < chnlIds.length; k++) {
                 chnlNames2.push("'" + chnlNames[k] + "'");
-                var tmpSql = "SELECT sum(tags." + chnlIds[k] + ") AS sm FROM tag where tags.UU05>0 and tags." + chnlIds[k] + ">0";
-                base_ajax(tmpSql, function (err) {
-                    chnlResult.push("{value:" + 0 + ", name:'" + chnlNames[k] + "'}");
-                }, function (data) {
-                    chnlResult.push("{value:" + parseInt(data.aggregations.sm.value) + ", name:'" + chnlNames[k] + "'}");
-                });
+                if (firstAllQDIdSum!="") firstAllQDIdSum+=",";
+                firstAllQDIdSum += "SUM(tags."+chnlIds[k]+"0000) AS K"+k;
             }
+            var firstQDIdSumSql = "SELECT "+firstAllQDIdSum+" FROM test2 ";
+            base_ajax(firstQDIdSumSql, function (err) {
+                chnlResult.push("{value:" + 0 + ", name:'" + chnlNames[k] + "'}");
+            }, function (data) {
+                // var r = JSON.stringify(data.aggregations);
+                var index = 0;
+                for(var key in data.aggregations){
+                    chnlResult.push("{value:" + parseInt(data.aggregations[key].value) + ", name:'" + chnlNames[index] + "'}");
+                    index += 1;
+                }
+            });
             showChnlEcharts(eval("([" + chnlNames2 + "])"), eval("([" + chnlResult + "])"));
-
             // 右侧Key关键
-            var keysTopSql = "SELECT * FROM tag where tags.keys is not null group by tags.keys limit 20";
+            var keysTopSql = "SELECT * FROM test2 where keys is not null group by keys limit 20";
             base_ajax(keysTopSql, function (err) {
                 $("#keysTopDiv").css("display", "none");
             }, function (data) {
-                var r = JSON.stringify(data.aggregations);
-                var robj = JSON.parse(r.replace("tags.keys", "k")).k;
+                // var r = JSON.stringify(data.aggregations);
+                // var robj = JSON.parse(r.replace("tags.keys", "k")).k;
+                var robj = data.aggregations.keys;
                 for (var i = 0; i < robj.buckets.length; i++) {
                     $("#keysTopShow").append('<tr class="' + trcss[i % 5] + '"><td>' + robj.buckets[i].key + '</td><td>' + robj.buckets[i].doc_count + '</td></tr>');
                     if (i < 15) {
@@ -816,21 +824,25 @@
         }
         // 第一次加载页面所有项默认为无限制 - 加载浮动层数据
         ajax_search_es_baseinfo();
-
-        var need_save_condition = "";
         // 页面上出现点击事件是触发, 同时获取当前页面各个表单选中的控件并组合条件
         function baseinfo_click() {
-            var scdt = '', stgcdt = '', stgFlag = false;
+            var scdt = '',agecdt = '', stgcdt = '', stgFlag = false;
             // 基本信息表单
             $("#baseinfo_form input:checked").each(function () {
                 var currtAttrName = $(this).attr("name"), currtAttrVal = $(this).val();
                 if (currtAttrName == "sex" && currtAttrVal != "0") {
                     if (scdt != "") {scdt += " OR ";}
-                    scdt += "tags." + currtAttrVal + ">0";
+                    scdt += "gender='" + currtAttrVal + "'";
                 } else if (currtAttrName == "sex" && currtAttrVal == "0") {// 性别不限
                     scdt = "";
                 }
                 // todo 添加年龄段查询条件
+                if (currtAttrName == 'yearR' && currtAttrVal == '0') {
+                    agecdt = '';
+                } else if (currtAttrName == 'yearOld' && currtAttrVal != '') {
+                    if (agecdt.length > 0) agecdt += " OR ";
+                    agecdt += "age='" + currtAttrVal + "'";
+                }
                 if (currtAttrName == "stage" && currtAttrVal == "0") {// 人生阶段不限
                     stgcdt = "";
                     stgFlag = false;
@@ -839,7 +851,7 @@
                 } else if (stgFlag) {
                     if (currtAttrVal != "0" && currtAttrVal != "1") {
                         if (stgcdt != "") stgcdt += " OR ";
-                        stgcdt += "tags." + currtAttrVal + ">0";
+                        stgcdt += "lfstage='" + currtAttrVal + "'";
                     }
                 }
                 if (currtAttrName == "hyd" && currtAttrVal == "1") {
@@ -858,52 +870,60 @@
                     ppvals = '';
                 } else if (crtName == 'ph_brand' && crtValue != '') {
                     if (ppvals.length > 0) ppvals += " OR ";
-                    ppvals += "tags." + crtValue + ">0";
+                    ppvals += "brand ='" + crtValue + "'";
                 }
                 // 价格
                 if (crtName == 'tel_price' && crtValue == '0') {
                     pcvals = '';
                 } else if (crtName == 'ph_price' && crtValue != '') {
                     if (pcvals.length > 0) pcvals += " OR ";
-                    pcvals += "tags." + crtValue + ">0";
+                    pcvals += "price='" + crtValue + "'";
                 }
                 // 操作系统
                 if (crtName == 'sys' && crtValue == '0') {
                     osvals = '';
                 } else if (crtName == 'ph_os' && crtValue != '') {
                     if (osvals.length > 0) osvals += " OR ";
-                    osvals += "tags." + crtValue + ">0";
+                    osvals += "client='" + crtValue + "'";
                 }
                 // 联网方式
                 if (crtName == 'net' && crtValue == '0') {
                     netvals = '';
                 } else if (crtName == 'ph_net' && crtValue != '') {
                     if (netvals.length > 0) netvals += " OR ";
-                    netvals += "tags." + crtValue + ">0";
+                    netvals += "network='" + crtValue + "'";
                 }
                 // 运营商
                 if (crtName == 'bs' && crtValue == '0') {
                     opvals = '';
                 } else if (crtName == 'ph_operator' && crtValue != '') {
                     if (opvals.length > 0) opvals += " OR ";
-                    opvals += "tags." + crtValue + ">0";
+                    opvals += "isp='" + crtValue + "'";
                 }
             });
             // 兴趣偏好表单
             var tree_xq_r_all_values = $("#tree_xq_r option").map(function () {
-                return "tags.inst='" + $(this).val() + "'";
+                var tagval = $(this).val();
+                if (tagval.length == 5) {
+                    return "instOneLev='" + $(this).val() + "'";
+                } else {
+                    return "inst='" + $(this).val() + "'";
+                }
             }).get().join(" OR ");
             var videoKeyWords = $("#video_kw").val();
             var tree_cqdd_r_all_values = $("#tree_cqdd_r option").map(function () {
-                return "tags." + $(this).val() + ">0";
+                var tagval = $(this).val();
+                if (tagval.length == 5){
+                    return "locOneLev='" + $(this).val() + "'";
+                }  else {
+                    return "location='" + $(this).val() + "'";
+                }
             }).get().join(" OR ");
             // 来源表单
             var tree_appfl_r_all_values = $("#tree_appfl_r option").map(function () {
-                return "tags." + $(this).val() + ">0";
+                return "category='" + $(this).val() + "'";
             }).get().join(" OR ");
-            var chnelvals = "";
-            var chnlId = "";
-            var chnlName = "";
+            var chnelvals = "", chnlId = "", chnlName = "", mJie="", adForm="";
             $("#source_form input:checked").each(function () {
                 var crtName = $(this).attr("name"), crtValue = $(this).val();
                 if (crtName == "way" && crtValue == "0") {
@@ -916,16 +936,30 @@
                         chnlId += ",";
                         chnlName += ",";
                     }
-                    chnelvals += "tags." + crtValue + ">0";
+                    chnelvals += "tags." + crtValue + "0000>0";
                     chnlId += crtValue;
                     chnlName += $(this).next().text();
+                }
+                // 媒介
+                if(crtName == "mediaR" && crtValue == "0"){
+                    mJie = "";
+                } else if(crtName == "media" && crtValue != ""){
+                    if (mJie != "") mJie += ",";
+                    mJie += crtValue;
+                }
+                // 广告形式
+                if(crtName == "adViewR" && crtValue == "0"){
+                    adForm = "";
+                } else if(crtName == "adView" && crtValue != ""){
+                    if(adForm != "") adForm += ",";
+                    adForm += crtValue;
                 }
             });
             var citiesvals = $("#tree_city_r option").map(function () {
                 if ($(this).val().length == 3) {
-                    return "tags.SSP" + $(this).text() + ">0";
+                    return "province='" + $(this).text() + "'";
                 } else if ($(this).val().length == 5) {
-                    return "tags.SSC" + $(this).text() + ">0";
+                    return "city='" + $(this).text() + "'";
                 }
             }).get().join(" OR ");
 
@@ -934,22 +968,24 @@
             hydcdt = $("#hyd").val();
             if (hydcdt != "0,0") {
                 if (parseInt(hydcdt.split(",")[1]) >= 90) { // 最大值越大覆盖人数越多
-                    hydSql = "tags.UU05>0";
+                    hydSql = "flow>0";
                 } else {
-                    hydSql = "tags.UU05>=" + hydcdt.split(",")[0] + " AND tags.UU05<=" + hydcdt.split(",")[1];
+                    hydSql = "flow>=" + hydcdt.split(",")[0] + " AND flow<=" + hydcdt.split(",")[1];
                 }
             } else {
-                hydSql = "tags.UU05>0";
+                hydSql = "flow>0";
             }
 
-            // 总人数 底价 流量
-            var ctSql = "SELECT COUNT(*) AS ky1,SUM(tags.UU05) AS ky3 FROM tag WHERE ";//+hydSql;,SUM(tags.UU19) AS ky2
+
             // 兴趣柱图
-            var instSql = "SELECT tags.inst FROM tag WHERE ";//+hydSql;
-            var kwsTop = "SELECT * FROM tag WHERE ";
+            var instSql = "SELECT inst FROM test2 WHERE ";//+hydSql;
+            var kwsTop = "SELECT * FROM test2 WHERE ";
             var allCndtion = hydSql;
             if (scdt != "") { // 性别
                 allCndtion += " AND (" + scdt + ")";
+            }
+            if (agecdt != "") { // 年龄段
+                allCndtion += " AND (" + agecdt + ")";
             }
             if (stgcdt != "") { // 人生阶段
                 allCndtion += " AND (" + stgcdt + ")";
@@ -980,7 +1016,7 @@
                         continue;
                     }
                     if (kwsql != "") kwsql += " OR ";
-                    kwsql += "tags.keys='" + mkeywords[kw] + "'";
+                    kwsql += "keys='" + mkeywords[kw] + "'";
                 }
                 allCndtion += " AND (" + kwsql + ")";
             }
@@ -991,34 +1027,66 @@
             if (tree_appfl_r_all_values != "") { // 应用分类
                 allCndtion += " AND (" + tree_appfl_r_all_values + ")";
             }
-            if (chnelvals != "") { // 渠道
-                allCndtion += " AND (" + chnelvals + ")";
+
+            // 渠道、媒介、广告位形式组合条件【用于计算流量】
+            var sumChnlMJAd = "", whereSumChnlMJAd="";
+            if(chnlId !="" || mJie !="" || adForm != "") {
+                var chnlIdArray = new Array("M00");
+                if (chnlId!="") chnlIdArray = chnlId.split(",");
+                var mjieArray = new Array("00");
+                if (mJie!="") mjieArray = mJie.split(",");
+                var adFormArray = new Array("00");
+                if (adForm!="") adFormArray = adForm.split(",");
+
+                for (var fid in chnlIdArray){
+                    for (var sid in mjieArray) {
+                        for (var tid in adFormArray) {
+                            if (sumChnlMJAd!="") sumChnlMJAd+=",";
+                            sumChnlMJAd += "SUM("+(chnlIdArray[fid]+mjieArray[sid]+adFormArray[tid])+")";
+                            if(whereSumChnlMJAd!="") whereSumChnlMJAd+=" OR ";
+                            whereSumChnlMJAd += "tags."+(chnlIdArray[fid]+mjieArray[sid]+adFormArray[tid])+">0";
+                        }
+                    }
+                }
+            } else {
+                sumChnlMJAd = "SUM(flow)";
             }
-            // todo 添加媒体查询条件
-            // todo 添加广告形式查询条件
+            if(whereSumChnlMJAd!="") { // 渠道、媒介、广告形式
+                $("#myChart02").hide();
+                allCndtion += " AND ("+whereSumChnlMJAd+")";
+            }
             if (citiesvals != "") { // 区域
                 allCndtion += " AND (" + citiesvals + ")";
             }
-            kwsTop += allCndtion + " group by tags.keys limit 20";
-            instSql += allCndtion + " group by tags.inst limit 10";
+            kwsTop += allCndtion + " group by keys limit 20";
+            instSql += allCndtion + " group by inst limit 10";
+
+             // 总人数 底价 流量
+            var ctSql = "SELECT COUNT(*) AS ky1,"+sumChnlMJAd+" FROM test2 WHERE ";//+hydSql;,SUM(tags.UU19) AS ky2
             ctSql += allCndtion;
-            // alert("1= "+allCndtion);
+            // alert("1= "+ctSql);
             // alert("2= "+kwsTop);
             need_save_condition = allCndtion;
+            need_save_updateSql = ctSql;
+            // alert("need_save_condition = " +allCndtion);
             base_ajax(ctSql, function (err) {
                 console.error(err);
             }, function (data) {
+                var totalSumll = 0;
+                for(var key in data.aggregations){
+                    if (key == "ky1") continue;
+                    totalSumll += parseInt(data.aggregations[key].value);
+                }
                 $("#humanCount").val(data.aggregations.ky1.value);
-                $("#humanFlux").val(data.aggregations.ky3.value);
+                $("#humanFlux").val(totalSumll);
                 number_animate("total_count", data.aggregations.ky1.value);
-                number_animate("ll_count", data.aggregations.ky3.value);
+                number_animate("ll_count", totalSumll);
             });
 
             base_ajax(instSql, function (err) {
                 alert("访问Elasticsearch服务异常, 请重试!");
             }, function (data) {
-                var r = JSON.stringify(data.aggregations);
-                var robj = JSON.parse(r.replace("tags.inst", "k")).k;
+                var robj = data.aggregations.inst;
                 var item = new Array();
                 var itemVal = new Array();
                 for (var i = 0; i < robj.buckets.length; i++) {
@@ -1038,36 +1106,46 @@
                 }
                 showInstrEcharts(item, itemVal);
             });
-            if (chnlId.length == 0 || chnlName.length == 0) {
-                {% for chnl in chnl_used_list %}
-                    if (chnlId != "") chnlId += ",";
-                    chnlId += "{{ chnl.dictId }}";
-                    if (chnlName != "") chnlName += ",";
-                    chnlName += "{{ chnl.dictName }}";
-                {% endfor %}
-            }
-            var chnlIds = chnlId.split(",");
-            var chnlNames = chnlName.split(",");
-            var chnlNames2 = new Array();
-            var chnlResult = new Array();
-            for (var k = 0; k < chnlIds.length; k++) {
-                chnlNames2.push("'" + chnlNames[k] + "'");
-                var tmpSql = "SELECT sum(tags." + chnlIds[k] + ") AS sm FROM tag where " + allCndtion;
-                base_ajax(tmpSql, function (err) {
-                    chnlResult.push("{value:" + 0 + ", name:'" + chnlNames[k] + "'}");
-                }, function (data) {
-                    chnlResult.push("{value:" + parseInt(data.aggregations.sm.value) + ", name:'" + chnlNames[k] + "'}");
-                });
-            }
-            showChnlEcharts(eval("([" + chnlNames2 + "])"), eval("([" + chnlResult + "])"));
+            <!-- 计算渠道饼状图 -->
+{#            if (chnlId.length == 0 || chnlName.length == 0) {#}
+{#                {% for chnl in chnl_used_list %}#}
+{#                    if (chnlId != "") chnlId += ",";#}
+{#                    chnlId += "{{ chnl.dictId }}";#}
+{#                    if (chnlName != "") chnlName += ",";#}
+{#                    chnlName += "{{ chnl.dictName }}";#}
+{#                {% endfor %}#}
+{#            }#}
+{#            var chnlIds = chnlId.split(",");#}
+{#            var chnlNames = chnlName.split(",");#}
+{#            var chnlNames2 = new Array();#}
+{#            var chnlResult = new Array();#}
+{#            var allQDIdSumStr = "";#}
+{#            for (var k = 0; k < chnlIds.length; k++) {#}
+{#                chnlNames2.push("'" + chnlNames[k] + "'");#}
+{#                if (allQDIdSumStr!="") allQDIdSumStr+=",";#}
+{#                allQDIdSumStr += "SUM(tags."+chnlIds[k]+"0000) AS K"+k;#}
+{#            }#}
+{#            var qudaoCndtSql = "SELECT "+allQDIdSumStr+" FROM test2 where " + allCndtion;#}
+{#            // alert(qudaoCndtSql);#}
+{#            base_ajax(qudaoCndtSql, function (err) {#}
+{#                chnlResult.push("{value:" + 0 + ", name:'" + chnlNames[k] + "'}");#}
+{#            }, function (data) {#}
+{#                var index = 0;#}
+{#                for(var key in data.aggregations){#}
+{#                    chnlResult.push("{value:" + parseInt(data.aggregations[key].value) + ", name:'" + chnlNames[index] + "'}");#}
+{#                    index += 1;#}
+{#                }#}
+{#            });#}
+{#            showChnlEcharts(eval("([" + chnlNames2 + "])"), eval("([" + chnlResult + "])"));#}
+            <!-- 计算渠道饼状图 End-->
+
             // 关键字排名
             base_ajax(kwsTop, function (err) {
                 $("#keysTopDiv").css("display", "none");
             }, function (data) {
                 $('#keysTopShow').find("tr:not(:first)").remove();
                 $("#linkKeywords button").remove();
-                var r = JSON.stringify(data.aggregations);
-                var robj = JSON.parse(r.replace("tags.keys", "k")).k;
+                var robj = data.aggregations.keys;
                 for (var i = 0; i < robj.buckets.length; i++) {
                     $("#keysTopShow").append('<tr class="' + trcss[i % 5] + '"><td>' + robj.buckets[i].key + '</td><td>' + robj.buckets[i].doc_count + '</td></tr>');
                     if (i < 15) {
@@ -1165,6 +1243,7 @@
                         humanName: $human.val(),
                         humanDesc: $humanDesc.val(),
                         humanCondition: need_save_condition,
+                        humanUpdateCdt: need_save_updateSql,
                         humanCount: $("#humanCount").val(),
                         humanFlux: $("#humanFlux").val()
                     },

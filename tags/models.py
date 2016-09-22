@@ -91,6 +91,7 @@ class StructHuman(models.Model):
     # instr = models.CharField(max_length=1000, blank=True, null=True)
     # source = models.CharField(max_length=1000, blank=True, null=True)
     search = models.CharField(max_length=3000, blank=True, null=True)
+    updateSql = models.CharField(max_length=3000, blank=True, null=True)
     humanCount = models.CharField(max_length=68, blank=True, null=True)
     humanFlux = models.CharField(max_length=68, blank=True, null=True)
     updateTime = models.CharField(max_length=32, blank=True, null=True)

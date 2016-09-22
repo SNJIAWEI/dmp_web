@@ -17,7 +17,7 @@
             $("#search").submit(function (e) {
                 var search_select_value = '';
                 $("#cType option:selected").each(function () {
-                    search_select_value += $(this).val().replace("UU04","") + ",";
+                    search_select_value += $(this).val()+ ",";
                 });
                 if (search_select_value) {
                     $("#q").attr("value", search_select_value);
@@ -29,7 +29,7 @@
             var selected_value = '{{ search_value }}';
             if (selected_value.length > 0) {
                 $.each(selected_value.split(","), function (i, val) {
-                    if (val) $("#cType option[value=" + 'UU04' +val + "]").attr("selected", true);
+                    if (val) $("#cType option[value=" +val + "]").attr("selected", true);
                 });
             }
         });
@@ -39,7 +39,7 @@
 {% block currentNav %}
     <li><a href="#">总览</a></li>
     <li><a href="/dmp/structmans/">人群构建</a></li>
-    <li><a href="#">人群分析</a></li>
+    <li><a href="/dmp/humananalyse/">人群分析</a></li>
     <li><a href="#">用户画像</a></li>
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 数据字典 <b class="caret"></b></a>
@@ -47,7 +47,6 @@
             <li><a href="/dmp/phoneinfo/">手机标注</a></li>
             <li><a href="/dmp/appsinfo/">APP标注</a></li>
             <li><a href="/dmp/locations/">位置信息</a></li>
-            {#        <li><a href="/dmp/ads/">广告信息</a></li>#}
             <li class="active"><a href="/dmp/interest/">兴趣映射</a></li>
         </ul>
     </li>
@@ -156,14 +155,14 @@
                     {% ifequal page channel.number %}
                         <li class="active"><a href="#">{{ page }}</a></li>
                     {% else %}
-                        <li><a href="?page={{ page }}&&pageMulti={{ pageMulti }}&&q={{ search_value }}">{{ page }}</a></li>
+                        <li><a href="?page={{ page }}&&pageMulti={{ pageMulti }}&&q={{ search_value }}&&cname={{ search_cname }}">{{ page }}</a></li>
                     {% endifequal %}
                 {% endif %}
             {% endfor %}
 
             {% if has_next %}
                 <li>
-                    <a href="?page={% widthratio pageMulti|add:1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'1' }}&&q={{ search_value }}"
+                    <a href="?page={% widthratio pageMulti|add:1 1 one_page_num %}&&pageMulti={{ pageMulti|add:'1' }}&&q={{ search_value }}&&cname={{ search_cname }}"
                        aria-label="Next">
                         <span aria-hidden="true">下一页</span>
                     </a>

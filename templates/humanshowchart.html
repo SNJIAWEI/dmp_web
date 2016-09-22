@@ -1,304 +1,285 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% block privateJsAndCss %}
-<!--<script src="{% static echarts/echarts.min.js" %}"></script> -->
-<script>
-  	$(document).ready(function(){
-   // elasticsearch.jquery.js  版
-   var client = new $.es.Client({
-        hosts: 'http://58.61.152.2:9210',
-        log: 'trace' //输出详细的调试信息
-      });
+    <script src="{% static "elasticsearch-js/elasticsearch.jquery.js" %}"></script>
+    <script src="{% static "echarts/echarts.min.js" %}"></script>
+    <script src="{% static "echarts/macarons.js" %}"></script>
+    <script>
+        $(document).ready(function () {
+            var qudaoMap = {{ qudaoMap|safe }};
+            var meijieMap = {{ meijieMap|safe }};
+            var adviewMap = {{ adviewMap|safe }}
 
-      client.ping({
-        requestTimeout: 3000,
-        hello: "elasticsearch"
-      }, function (error) {
-        if (error) {
-          //console.error('elasticsearch cluster is down!');
-        } else {
-          //console.log('All is well');
-        }
-      });
+            var client = new $.es.Client({
+                hosts: 'http://58.61.152.2:9210',log: 'trace' //输出详细的调试信息
+            });
 
-      client.search({
-        index: 'test2',
-        type: 'taglib',
-        body: {
-          "query":{
-    "query_string": {
-      //"query": "gender:* AND ( M160000:* OR M180004:* OR M000000:* ) OR lfstage:*"
-      "query": "inst:*"
-    }
-  }
-	,"aggs":
-	{
-	"aggsflow":{
-	"sum":{"field":"flow"}
-	},
-	"aggsgender":{"terms":{"field":"gender"}},
-	"aggsage":{"terms":{"field":"age"}},
-	"aggslfstage":{"terms":{"field":"lfstage"}},
-	"aggsinst":{
-	"terms": {
-	"size":5,
-	"field": "inst"
-	}
-	},
-	"aggsinstOneLev":{
-	"terms": {
-	"size":5,
-	"field": "instOneLev"
-	}
-	},
-	"aggslocation":{
-	"terms": {
-	"size":5,
-	"field": "location"
-	}
-	},
-	"aggslocOneLev":{
-	"terms": {
-	"size":3,
-	"field": "locOneLev"
-	}
-	},
-	"aggskeys":{
-	"significant_terms": {
-	"size":20,
-	"field": "keys"
-	}
-	},
-	"aggscategory":{
-	"terms": {
-	"field": "category"
-	}
-	},
-	"aggsprovince":{
-	"terms": {
-	"field": "province"
-	}
-	}
-	,
-	"aggsprice":{
-	"terms": {
-	"field": "price"
-	}
-	}
-	,
-	"aggsbrand":{
-	"terms": {
-	"field": "brand"
-	}
-	}
-	,
-	"aggsisp":{
-	"terms": {
-	"field": "isp"
-	}
-	},
-	"aggsnetwork":{
-	"terms": {
-	"field": "network"
-	}
-	},
-	"aggsclient":{
-	"terms": {
-	"field": "client"
-	}
-	},"aggsmidea":{
-		"terms": {
-	"field": "midea"
-	}
-	}
-	}
-}
-      }).then(function (resp) {
-        // 年龄
-        var ageMap ={"p01030001":"0-12","p01030002":"12-19","p01030003":"19-25","p01030004":"25-30","p01030005":"30-35","p01030006":"35-40","p01030007":"40-45","p01030008":"45-60","p01030009":"60以上"};
-        var age=resp.aggregations.aggsage.buckets;
-		str =""
-        for (var i=0;i<age.length;i++){
-		if(i>0){
-		str += ','
-		}
-		str += "{value:"+age[i].doc_count+",name:'"+ageMap[age[i].key]+"'}"
-        	}
-			optionage.series[0].data = eval('[' + str + ']') ;
-    		chartage.setOption(optionage,true);
+            client.search({
+                index: 'test2',
+                type: 'taglib',
+                body: {
+                    "query": {
+                        "query_string": {
+                            //"query": "gender:* AND ( M160000:* OR M180004:* OR M000000:* ) OR lfstage:*"
+                            "query": "{{ elastic_condition }}"
+                        }
+                    },
+                    "aggs": {
+                        "aggsflow": {
+                            "sum": {"field": "flow"}
+                        },
+                        "aggsgender": {"terms": {"field": "gender"}},
+                        "aggsage": {"terms": {"field": "age"}},
+                        "aggslfstage": {"terms": {"field": "lfstage"}},
+                        "aggsinst": {
+                            "terms": {
+                                "size": 5,
+                                "field": "inst"
+                            }
+                        },
+                        "aggsinstOneLev": {
+                            "terms": {
+                                "size": 5,
+                                "field": "instOneLev"
+                            }
+                        },
+                        "aggslocation": {
+                            "terms": {
+                                "size": 5,
+                                "field": "location"
+                            }
+                        },
+                        "aggslocOneLev": {
+                            "terms": {
+                                "size": 3,
+                                "field": "locOneLev"
+                            }
+                        },
+                        "aggskeys": {
+                            "significant_terms": {
+                                "size": 20,
+                                "field": "keys"
+                            }
+                        },
+                        "aggscategory": {
+                            "terms": {
+                                "field": "category"
+                            }
+                        },
+                        "aggsprovince": {
+                            "terms": {
+                                "field": "province"
+                            }
+                        }
+                        ,
+                        "aggsprice": {
+                            "terms": {
+                                "field": "price"
+                            }
+                        }
+                        ,
+                        "aggsbrand": {
+                            "terms": {
+                                "field": "brand"
+                            }
+                        }
+                        ,
+                        "aggsisp": {
+                            "terms": {
+                                "field": "isp"
+                            }
+                        },
+                        "aggsnetwork": {
+                            "terms": {
+                                "field": "network"
+                            }
+                        },
+                        "aggsclient": {
+                            "terms": {
+                                "field": "client"
+                            }
+                        },
+                        "qudaopiecharts": {
+                            "terms": {
+                                "field": "media",
+                                "include": "m.*0000",
+                                "exclude": "m000000"
+                            }
+                        },
+                        "meijieadviewcharts": {
+                            "terms": {
+                                "field": "media",
+                                "include": "m00.*",
+                                "exclude": "m0000.*|m00.*00"
+                            }
+                        }
+                    }
+                }
+            }).then(function (resp) {
+                <!-- 渠道饼状图 -->
+                // alert(JSON.stringify(resp.aggregations.qudaopiecharts));
+                var qudaopiechartsdata = resp.aggregations.qudaopiecharts.buckets;
+                var item = new Array();
+                var itemVal = new Array();
+                for (var k in qudaopiechartsdata) {
+                    var qudaoname = qudaoMap[qudaopiechartsdata[k].key.toUpperCase()];
+                    if (typeof qudaoname === 'undefined' || "" == qudaoname) {
+                        item.push("'"+qudaopiechartsdata[k].key+"'");
+                        itemVal.push("{value:" + parseInt(qudaopiechartsdata[k].doc_count) + ", name:'"+qudaopiechartsdata[k].key+"'}");
+                    } else {
+                        item.push("'"+qudaoMap[qudaopiechartsdata[k].key.toUpperCase()]+"'");
+                        itemVal.push("{value:" + parseInt(qudaopiechartsdata[k].doc_count) + ", name:'" + qudaoname + "'}");
+                    }
+                }
+                showQudaoPieCharts(eval("([" + item + "])"), eval("([" + itemVal + "])"));
 
-      },function (err) {
-       $('#results').html(JSON.stringify(err))
-       console.trace(err.message);
-      });
+                <!-- 媒介、广告位形式 -->
+                var meijieadviewchartsdata = resp.aggregations.meijieadviewcharts.buckets;
+                var meijieadviewchartsdatastr = "{";
+                for(var k in meijieadviewchartsdata){
+                    meijieadviewchartsdatastr += "'"+meijieadviewchartsdata[k].key +"':"+meijieadviewchartsdata[k].doc_count+","
+                }
+                meijieadviewchartsdatastr += "}";
+                var meijieadviewchartsdataMap = eval("("+meijieadviewchartsdatastr+")");
+                var mjAlldata = new Array();
+                var adviewType = new Array(); // 广告形式
+                var index = 0;
+                var chartsjson = new Array();
+
+                for (var x in adviewMap) { // 12个图例
+                    var admjAllData = new Array();
+                    adviewType.push("'"+adviewMap[x]+"'");
+                    var tempItem = "{name: '"+adviewMap[x]+"',type: 'bar',stack: '总量',label: {normal: {show: true, position: 'insideRight'}},";
+                    for (var o in meijieMap) { // 媒介
+                        if(index == 0) mjAlldata.push("'"+meijieMap[o]+" '");
+                        var doc_ct = meijieadviewchartsdataMap["m00"+o+x];
+                        if(typeof doc_ct === 'undefined') {
+                            admjAllData.push("0");
+                        } else {
+                            admjAllData.push(parseInt(doc_ct));
+                        }
+                    }
+                    tempItem += "data: ["+admjAllData+"]}";
+                    chartsjson.push(tempItem);
+                    index ++;
+                }
+                showMeiJieAdlocalCharts(eval("(["+mjAlldata+"])"), eval("(["+adviewType+"])"), eval("(["+chartsjson+"])"));
+            }, function (err) {
+                $('#results').html(JSON.stringify(err));
+                console.trace(err.message);
+            });
+        });
 
 
-	})
-	});
-
-
-</script>
-
-
+    </script>
 {% endblock %}
 
 {% block currentNav %}
-<li><a href="#">总览</a></li>
-<li><a href="/dmp/structmans/">人群构建</a></li>
-<li class="active"><a href="/dmp/humananalyse/">人群分析</a></li>
-<li><a href="#">用户画像</a></li>
-<li class="dropdown">
-    <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 数据字典 <b class="caret"></b></a>
-    <ul class="dropdown-menu">
-        <li><a href="/dmp/phoneinfo/">手机标注</a></li>
-        <li class="active"><a href="#">APP标注</a></li>
-        <li><a href="/dmp/locations/">位置信息</a></li>
-        {#
-        <li><a href="/dmp/ads/">广告信息</a></li>
-        #}
-        <li><a href="/dmp/interest/">兴趣映射</a></li>
-    </ul>
-</li>
-<li><a href="#">工具</a></li>
-<li><a href="/admin" target="_blank">管理</a></li>
+    <li><a href="#">总览</a></li>
+    <li><a href="/dmp/structmans/">人群构建</a></li>
+    <li class="active"><a href="/dmp/humananalyse/">人群分析</a></li>
+    <li><a href="#">用户画像</a></li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 数据字典 <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li><a href="/dmp/phoneinfo/">手机标注</a></li>
+            <li><a href="/dmp/appsinfo/">APP标注</a></li>
+            <li><a href="/dmp/locations/">位置信息</a></li>
+            <li><a href="/dmp/interest/">兴趣映射</a></li>
+        </ul>
+    </li>
+    <li><a href="#">工具</a></li>
+    <li><a href="/admin" target="_blank">管理</a></li>
 {% endblock %}
 
 {% block contentPage %}
-<nav class="navbar navbar-default" role="navigation">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">{{ elastic_condition }}</a>
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">{{ transprarent }}</a>
+            </div>
         </div>
+    </nav>
+
+    <div class="row">
+        <div class="col-md-6" style="height: 300px;" id="qudaopiechartsdiv"></div>
+        <div class="col-md-12" style="width: 100%;height: 450px;" id="meijieadechartsdiv"></div>
     </div>
-</nav>
 
-<div class="row">
-    <div class="col-md-6" style="height: 400px;" id="main"></div>
-    <div class="col-md-6" style="height: 400px;" id="main2"></div>
-</div>
-
-<div id="main3" style="width: 600px;height:400px;"></div>
-<script type="text/javascript">
-        // 基于准备好的dom，初始化echarts实例
-        var myChart = echarts.init(document.getElementById('main'));
-        var myChart2 = echarts.init(document.getElementById('main2'));
-        var myChart3 = echarts.init(document.getElementById('main3'));
-
-        // 指定图表的配置项和数据
-        var option = {
-            title: {
-                text: 'ECharts 入门示例'
-            },
-            tooltip: {},
-            legend: {
-                data:['销量']
-            },
-            xAxis: {
-                data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-            },
-            yAxis: {},
-            series: [{
-                name: '销量',
-                type: 'bar',
-                data: [5, 20, 36, 10, 10, 20]
-            }]
-        };
-
-
-        var option2 = {
-            title: {
-                text: '堆叠条形图'
-            },
-            tooltip : {
-                trigger: 'axis',
-                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-                }
-            },
-            legend: {
-                data: ['直接访问', '邮件营销','联盟广告','视频广告','搜索引擎']
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            xAxis:  {
-                type: 'value'
-            },
-            yAxis: {
-                type: 'category',
-                data: ['周一','周二','周三','周四','周五','周六','周日']
-            },
-            series: [
-                {
-                    name: '直接访问',
-                    type: 'bar',
-                    stack: '总量',
-                    label: {
-                        normal: {
-                            show: true,
-                            position: 'insideRight'
-                        }
-                    },
-                    data: [320, 302, 301, 334, 390, 330, 320]
+    <div id="main3" style="width: 600px;height:400px;"></div>
+    <script type="text/javascript">
+        // 媒介、广告位形式图
+        function showMeiJieAdlocalCharts(yitem, lgitem, jsondata) {
+            var myChart = echarts.init(document.getElementById('meijieadechartsdiv'), 'macarons');
+            var option = {
+                title: {
+                    x: 'left',
+                    text: '媒介广告位形式',
+                    subtext: '统计每个媒介下各个广告位形式流量数据',
                 },
-                {
-                    name: '邮件营销',
-                    type: 'bar',
-                    stack: '总量',
-                    label: {
-                        normal: {
-                            show: true,
-                            position: 'insideRight'
-                        }
-                    },
-                    data: [120, 132, 101, 134, 90, 230, 210]
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    }
                 },
-                {
-                    name: '联盟广告',
-                    type: 'bar',
-                    stack: '总量',
-                    label: {
-                        normal: {
-                            show: true,
-                            position: 'insideRight'
-                        }
-                    },
-                    data: [220, 182, 191, 234, 290, 330, 310]
+                legend: {
+                    orient: 'vertical',
+                    right: 'right',
+                    data: lgitem
                 },
-                {
-                    name: '视频广告',
-                    type: 'bar',
-                    stack: '总量',
-                    label: {
-                        normal: {
-                            show: true,
-                            position: 'insideRight'
-                        }
-                    },
-                    data: [150, 212, 201, 154, 190, 330, 410]
+                grid: {
+                    left: '1%',
+                    right: '10%',
+                    bottom: '1%',
+                    containLabel: true
                 },
-                {
-                    name: '搜索引擎',
-                    type: 'bar',
-                    stack: '总量',
-                    label: {
-                        normal: {
-                            show: true,
-                            position: 'insideRight'
+                xAxis: {
+                    type: 'value'
+                },
+                yAxis: {
+                    type: 'category',
+                    data: yitem
+                },
+                series: jsondata
+            };
+            myChart.setOption(option);
+        }
+        // 渠道饼状图
+        function showQudaoPieCharts(item, itemVal) {
+            var quDaoPieCharts = echarts.init(document.getElementById('qudaopiechartsdiv'), "macarons");
+            var options = {
+                title: {
+                    text: '渠道流量',
+                    x: 'center'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    data: item
+                },
+                series: [
+                    {
+                        name: '流量',
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['50%', '60%'],
+                        data: itemVal,
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
                         }
-                    },
-                    data: [820, 832, 901, 934, 1290, 1330, 1320]
-                }
-            ]
-        };
-
-        // 使用刚指定的配置项和数据显示图表。
-        myChart.setOption(option);
-    myChart2.setOption(option2);
-    myChart3.setOption(option);
-
-</script>
+                    }
+                ]
+            };
+            quDaoPieCharts.setOption(options);
+        }
+    </script>
 {% endblock %}

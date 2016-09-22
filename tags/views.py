@@ -1,12 +1,9 @@
 # coding: utf-8
-import json, urllib, time, os, tempfile, zipfile, shutil
-
+import json, urllib, time, os, zipfile, shutil
 from django.contrib import messages
 from django.shortcuts import render
-# from django.core.servers.basehttp import FileWrapper
-from wsgiref.util import FileWrapper
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, InvalidPage
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, StreamingHttpResponse
+from django.http import HttpResponseRedirect, JsonResponse, StreamingHttpResponse
 from tags.models import APPInfo, DMPDict, PhoneInfo, LocationInfo, ChannelInterest, StructHuman
 
 
@@ -18,6 +15,7 @@ sys.setdefaultencoding( "utf-8" )
 # Create your views here.
 one_page_num = 15
 ISOTIMEFORMAT='%Y-%m-%d %X'
+ELASTICSEARCHSERVER = 'http://58.61.152.2:9210/_sql?sql='
 
 ## APP查询
 def appsinfo_main(request):
@@ -212,11 +210,15 @@ def save_struct_condition(request):
         humanName = request.POST['humanName']
         humanDesc = request.POST['humanDesc']
         human = StructHuman.objects.create(name=humanName, desc=humanDesc)
-        human.search = request.POST['humanCondition']
+
+        if request.POST['humanCondition']:
+            human.search = request.POST['humanCondition']
+        else:
+            human.search = "*"
+        human.updateSql = str(request.POST['humanUpdateCdt']).replace("'","\\'")
         human.humanCount = request.POST['humanCount']
         human.humanFlux = request.POST['humanFlux']
         human.updateTime = time.strftime(ISOTIMEFORMAT,time.localtime())
-        print humanName, humanDesc
         human.save()
     else:
         mssg = {'message': '保存失败啦!'}
@@ -327,7 +329,8 @@ def interest_main(request):
 
     channel_list = ChannelInterest.objects.filter(isUsed=1).order_by("cId", "chnId")
     if len(search) > 0:
-        channel_list = channel_list.filter(cId__in=search.split(","))
+        tmpsearch = search.replace("M", "1000").replace("99", "00")
+        channel_list = channel_list.filter(cId__in=tmpsearch.split(","))
     if len(search_cname) > 0:
         channel_list = channel_list.filter(chnName__contains=search_cname)
 
@@ -535,7 +538,12 @@ def human_update(request):
 def human_export(request):
     if request.method == "GET":
         humanObj = StructHuman.objects.get(id=request.GET.get("id"))
-        result = urllib.urlopen("http://58.61.152.2:9210/_sql?sql=SELECT%20IMEI,IMEIMD5,MAC,PUID%20FROM%20test%20WHERE%20MAC%20is%20not%20null")
+        sql = "SELECT IMEI,IMEIMD5,MAC,PUID FROM test2"
+        if not humanObj.search.__eq__("*"):
+            sql += " WHERE "+humanObj.search
+        else:
+            pass
+        result = urllib.urlopen(ELASTICSEARCHSERVER+sql)
         result_jsons =json.loads(result.read())["hits"]["hits"]
         data_imei = []
         data_imeimd5 = []
@@ -620,3 +628,59 @@ def human_export(request):
 
     return response
 
+
+def human_show_chart(request):
+    if request.method == "GET":
+        humanObj = StructHuman.objects.get(id=request.GET.get("id"))
+        elastic_condition = humanObj.search
+        elastic_condition = elastic_condition.replace(">0", ":*").replace("'", "").replace("=", ":")
+
+        dict_all_data = DMPDict.objects.filter(isUsed=1)
+        transprarent = elastic_condition.replace("*", "全部")\
+            .replace("gender", "性别")\
+            .replace("age","年龄")\
+            .replace("lfstage","人生阶段")\
+            .replace("flow", "流量")\
+            .replace("keys", "关键字")\
+            .replace("app", "应用名称")\
+            .replace("category","应用类别")\
+            .replace("client", "操作系统")\
+            .replace("network", "联网方式")\
+            .replace("isp", "运营商")\
+            .replace("price","价格")\
+            .replace("brand","品牌")\
+            .replace("city","城市")\
+            .replace("province","省")\
+            .replace("channel","渠道")\
+            .replace("inst","兴趣爱好")\
+            .replace("instOneLev","一级兴趣爱好")\
+            .replace("location","常去地点")\
+            .replace("locOneLev","一级常去地点")
+
+        for d in dict_all_data:
+            transprarent = transprarent.replace(d.dictId, d.dictName)
+
+        qudaoList = {}
+        for qd in DMPDict.objects.filter(dictType='渠道'):
+            qudaoList[qd.dictId+"0000"] = qd.dictName
+        qudaoMap = json.dumps(qudaoList)
+
+        meijieList = {}
+        for mj in DMPDict.objects.order_by("dictId").filter(dictType='媒介'):
+            meijieList[mj.dictId]= mj.dictName
+        meijieMap = json.dumps(meijieList)
+
+        adViewList = {}
+        for ad in DMPDict.objects.order_by("dictId").filter(dictType='广告形式'):
+            adViewList[ad.dictId] = ad.dictName
+        adviewMap = json.dumps(adViewList)
+
+    else:
+        pass
+    return  render(request, "humanshowchart.html",{
+        "elastic_condition": elastic_condition,
+        "qudaoMap": qudaoMap,
+        "meijieMap": meijieMap,
+        "adviewMap": adviewMap,
+        "transprarent": transprarent
+    })

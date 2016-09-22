@@ -13,18 +13,18 @@
             extraClasses: 'messenger-fixed messenger-theme-future messenger-on-top messenger-on-right'
         }
         function updateSearch(conditions) {
-            var search_sql = "SELECT COUNT(*) AS ky1,SUM(tags.UU05) as ky3 FROM tag";
-            if (conditions != "") {
-                search_sql += " where " + conditions;
-            }
-            base_ajax(search_sql, function (err) {
+            base_ajax(conditions, function (err) {
                 console.error(err);
                 alert("更新失败!");
             }, function (data) {
+                var totalSumll = 0;
+                for(var key in data.aggregations){
+                    if (key == "ky1") continue;
+                    totalSumll += parseInt(data.aggregations[key].value);
+                }
                 var total_count = data.aggregations.ky1.value;
-                var ll_count = data.aggregations.ky3.value;
                 var $update = $("#updateSch").attr("href");
-                $("#updateSch").attr("href", $update+"&&tc="+total_count+"&&lc="+ll_count);
+                $("#updateSch").attr("href", $update+"&&tc="+total_count+"&&lc="+totalSumll);
                 alert("更新成功!");
             });
         }
@@ -40,9 +40,8 @@
         <a href="#" class="dropdown-toggle" data-toggle="dropdown"> 数据字典 <b class="caret"></b></a>
         <ul class="dropdown-menu">
             <li><a href="/dmp/phoneinfo/">手机标注</a></li>
-            <li class="active"><a href="#">APP标注</a></li>
+            <li><a href="/dmp/appsinfo/">APP标注</a></li>
             <li><a href="/dmp/locations/">位置信息</a></li>
-            {#            <li><a href="/dmp/ads/">广告信息</a></li>#}
             <li><a href="/dmp/interest/">兴趣映射</a></li>
         </ul>
     </li>
@@ -114,10 +113,10 @@
                 <td title="{{ hm.humanFlux }}">{{ hm.humanFlux }}</td>
                 <td title="{{ hm.updateTime }}">{{ hm.updateTime }}</td>
                 <td>
-                    <a href="/dmp/humananalyse/edit/?id={{ hm.id }}&&p={{ humans.number }}&&pm={{ pageMulti }}&&hmName={{ search_value }}"
+                    <a href="/dmp/humananalyse/showchart/?id={{ hm.id }}&&p={{ humans.number }}&&pm={{ pageMulti }}&&hmName={{ search_value }}"
                        role="button" data-toggle="modal">查看</a>&nbsp;&nbsp;
                     <a href="/dmp/humananalyse/update/?id={{ hm.id }}&&p={{ humans.number }}&&pm={{ pageMulti }}&&hmName={{ search_value }}"
-                       role="button" data-toggle="modal" onclick="updateSearch('{{ hm.search }}');" id="updateSch">更新</a>&nbsp;&nbsp;
+                       role="button" data-toggle="modal" onclick="updateSearch('{{ hm.updateSql }}');" id="updateSch">更新</a>&nbsp;&nbsp;
                     <a href="/dmp/humananalyse/export/?id={{ hm.id }}&&p={{ humans.number }}&&pm={{ pageMulti }}&&hmName={{ search_value }}"
                        role="button" data-toggle="modal">导出</a>&nbsp;&nbsp;
                     <a href="/dmp/humananalyse/delete/?id={{ hm.id }}&&p={{ humans.number }}&&pm={{ pageMulti }}&&hmName={{ search_value }}"
